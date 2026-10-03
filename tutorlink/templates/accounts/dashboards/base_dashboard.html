@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | TutorLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{navy:'#1F2A5C',indigoCustom:'#2E3C86',coral:'#FF6B5B',mint:'#E7F8F1',sunshine:'#FBE77B',success:'#12A783'}}}}</script>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+<div class="min-h-screen flex">
+    <aside class="hidden md:flex w-64 bg-navy text-white p-6 flex-col">
+        <a href="{% url 'role_dashboard' %}" class="flex items-center gap-3 mb-9">
+            <div class="w-10 h-10 rounded-xl bg-sunshine text-navy flex items-center justify-center">🎓</div>
+            <div><div class="font-bold text-xl font-serif">TutorLink</div><div class="text-[10px] text-slate-300">Connect • Learn • Earn • Safety</div></div>
+        </a>
+        <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Workspace</div>
+        <nav class="space-y-1 text-sm">
+            <a href="{% url 'role_dashboard' %}" class="block px-3 py-2.5 rounded-xl bg-white/10">Dashboard</a>
+            {% block nav %}{% endblock %}
+        </nav>
+        <div class="mt-auto border-t border-white/10 pt-5">
+            <div class="text-xs text-slate-300 mb-3">Signed in as <b class="text-white">{{ user.get_full_name|default:user.username }}</b></div>
+            <a href="{% url 'logout' %}" class="block px-3 py-2.5 rounded-xl bg-coral text-white text-sm text-center font-semibold">Log out</a>
+        </div>
+    </aside>
+    <main class="flex-1 p-5 md:p-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-7">
+                <div><div class="text-xs text-slate-400 uppercase tracking-widest">TutorLink</div><h1 class="text-3xl font-bold font-serif text-navy">{% block heading %}Dashboard{% endblock %}</h1></div>
+                <div class="px-4 py-2 bg-white rounded-xl border text-xs font-semibold text-navy">{{ role_name }}</div>
+            </div>
+            {% if messages %}{% for message in messages %}<div class="mb-5 p-3 rounded-xl bg-white border border-emerald-100 text-sm">{{ message }}</div>{% endfor %}{% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+</body>
+</html>
