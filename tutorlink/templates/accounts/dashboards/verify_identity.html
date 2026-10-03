@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification - TutorLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#1F2A5C',
+                        indigoCustom: '#263086',
+                        coral: '#FF6858',
+                        mint: '#E7FBF1',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-6 md:p-10">
+
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <div>
+                <h1 class="text-2xl font-bold font-serif text-navy">Identity Verification</h1>
+                <p class="text-xs text-slate-500">Upload documents so the community knows you are real</p>
+            </div>
+            <a href="{% url 'logout' %}" class="text-xs text-coral font-semibold hover:underline">Log Out</a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-green-100 text-green-700 text-sm p-3 rounded-xl mb-6">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid grid-cols-3 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border text-center text-xs">
+            <div class="p-2 rounded-xl bg-navy text-white font-semibold">
+                1. Submitted
+            </div>
+            <div class="p-2 rounded-xl {% if has_pending %}bg-yellow-500 text-white font-semibold{% else %}bg-slate-200 text-slate-600{% endif %}">
+                2. Under review
+            </div>
+            <div class="p-2 rounded-xl {% if is_approved %}bg-emerald-600 text-white font-semibold{% else %}bg-slate-200 text-slate-600{% endif %}">
+                3. Approved
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="mb-8">
+            {% csrf_token %}
+
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">Document Type</label>
+                <select name="doc_type" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-navy outline-none">
+                    <option value="STUDENT_ID">Student ID Card</option>
+                    <option value="ID_CARD">National ID Card / Passport</option>
+                    <option value="CERTIFICATE">Academic Certificate</option>
+                    <option value="OTHER">Other Official Document</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">Upload Document (JPG, PNG or PDF max 5 MB)</label>
+                <input type="file" name="document_file" required accept=".jpg,.jpeg,.png,.pdf" class="w-full p-4 border-2 border-dashed border-slate-300 rounded-2xl text-xs text-slate-600 bg-slate-50">
+            </div>
+
+            <button type="submit" class="bg-navy text-white font-semibold px-6 py-3 rounded-xl hover:bg-opacity-90 transition text-sm">Submit for Review</button>
+        </form>
+
+        <h3 class="text-sm font-bold text-navy uppercase mb-3">Submitted Files</h3>
+        <div class="space-y-3">
+            {% for doc in user_documents %}
+                <div class="flex items-center justify-between p-4 border rounded-2xl bg-slate-50">
+                    <div>
+                        <p class="text-xs font-bold text-navy">{{ doc.get_doc_type_display }}</p>
+                        <p class="text-xs text-slate-400">{{ doc.submitted_at|date:"M d, Y - h:i A" }}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold
+                        {% if doc.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                        {% elif doc.status == 'APPROVED' %}bg-green-100 text-green-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ doc.get_status_display }}
+                    </span>
+                </div>
+            {% empty %}
+                <p class="text-xs text-slate-400">No documents submitted yet.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</body>
+</html>
