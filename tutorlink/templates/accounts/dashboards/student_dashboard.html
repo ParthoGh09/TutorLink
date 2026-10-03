@@ -1,0 +1,25 @@
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block heading %}Student Home{% endblock %}
+{% block nav %}
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Post a Tuition Need</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tutors</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Applications</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
+{% endblock %}
+{% block content %}
+<div class="bg-navy text-white rounded-3xl p-7 md:p-9 mb-6">
+    <p class="text-sm text-slate-300">Welcome back, {{ user.first_name|default:user.username }} 👋</p>
+    <h2 class="text-3xl font-bold font-serif mt-1">Find a tutor who fits your needs.</h2>
+    <p class="text-sm text-slate-300 mt-3 max-w-2xl">Search verified tutors, publish a tuition need and use the online-first demo flow described in the TutorLink design.</p>
+    <div class="mt-6 flex flex-wrap gap-3"><a href="#" class="px-4 py-2.5 rounded-xl bg-sunshine text-navy text-sm font-bold">Find Tutors</a><a href="#" class="px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-semibold">Post a Tuition Need</a></div>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+{% for item in "Find Tutors,Post Tuition Need,Applications,Demo Classes"|make_list %}{% endfor %}
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">🔎</div><h3 class="font-bold text-navy mt-3">Find Tutors</h3><p class="text-xs text-slate-500 mt-1">Filter by subject, level, budget and area.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📝</div><h3 class="font-bold text-navy mt-3">Tuition Post</h3><p class="text-xs text-slate-500 mt-1">Publish your requirement and trigger matching.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📋</div><h3 class="font-bold text-navy mt-3">Applications</h3><p class="text-xs text-slate-500 mt-1">Track tutor applications and decisions.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">💻</div><h3 class="font-bold text-navy mt-3">Demo Classes</h3><p class="text-xs text-slate-500 mt-1">Manage your mandatory online demo.</p></div>
+</div>
+{% endblock %}
