@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TutorLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#1F2A5C', indigoCustom: '#2E3C86', coral: '#FF6B5B',
+                        mint: '#E7F8F1', sunshine: '#FBE77B', success: '#12A783'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .role-card { transition: .2s ease; }
+        .role-card:hover { transform: translateY(-1px); }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-6xl w-full bg-white rounded-[28px] shadow-2xl overflow-hidden grid lg:grid-cols-[1fr_1.05fr]">
+
+    <section class="bg-navy p-8 md:p-12 text-white flex flex-col justify-between min-h-[650px]">
+        <div>
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-11 h-11 rounded-xl bg-sunshine text-navy flex items-center justify-center text-xl">🎓</div>
+                <div>
+                    <div class="text-2xl font-bold font-serif">TutorLink</div>
+                    <div class="text-xs text-slate-300">Connect | Learn | Earn | Safety</div>
+                </div>
+            </div>
+
+            <span class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-semibold mb-4">WELCOME BACK</span>
+            <h1 class="text-4xl md:text-5xl font-bold font-serif leading-tight">One platform.<br>Three secure roles.</h1>
+            <p class="text-sm text-slate-300 mt-5 max-w-md">Choose the account role that matches your account. TutorLink will take you directly to the correct interface after authentication.</p>
+
+            <div class="mt-9 space-y-4">
+                <div class="flex gap-3"><span class="p-2 rounded-lg bg-white/10">🛡️</span><div><b class="text-sm">Verified community</b><p class="text-xs text-slate-300">Verification is handled before trusted interactions.</p></div></div>
+                <div class="flex gap-3"><span class="p-2 rounded-lg bg-white/10">✨</span><div><b class="text-sm">Smart matching</b><p class="text-xs text-slate-300">Match by subject, level, budget, area and schedule.</p></div></div>
+                <div class="flex gap-3"><span class="p-2 rounded-lg bg-white/10">💻</span><div><b class="text-sm">Online-first demo</b><p class="text-xs text-slate-300">Start with a safe online demo before offline tuition.</p></div></div>
+            </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-10">Your exact address and verification documents are kept private.</p>
+    </section>
+
+    <section class="p-7 md:p-12 flex flex-col justify-center">
+        <div class="max-w-lg w-full mx-auto">
+            <h2 class="text-3xl font-bold font-serif text-navy">Sign in</h2>
+            <p class="text-sm text-slate-500 mt-1 mb-6">Select your role, then enter your credentials.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-xl text-sm {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}" id="loginForm">
+                {% csrf_token %}
+                <div class="grid grid-cols-3 gap-2 p-1.5 bg-slate-100 rounded-2xl mb-6">
+                    {% for value,label,icon in role_options %}{% endfor %}
+                    <label class="role-card cursor-pointer">
+                        <input type="radio" name="role" value="STUDENT" class="sr-only peer" {% if selected_role == 'STUDENT' or not selected_role %}checked{% endif %}>
+                        <span class="block text-center rounded-xl py-3 text-xs sm:text-sm font-semibold text-slate-600 peer-checked:bg-navy peer-checked:text-white">👤 Student</span>
+                    </label>
+                    <label class="role-card cursor-pointer">
+                        <input type="radio" name="role" value="TUTOR" class="sr-only peer" {% if selected_role == 'TUTOR' %}checked{% endif %}>
+                        <span class="block text-center rounded-xl py-3 text-xs sm:text-sm font-semibold text-slate-600 peer-checked:bg-navy peer-checked:text-white">👨‍🏫 Tutor</span>
+                    </label>
+                    <label class="role-card cursor-pointer">
+                        <input type="radio" name="role" value="ADMIN" class="sr-only peer" {% if selected_role == 'ADMIN' %}checked{% endif %}>
+                        <span class="block text-center rounded-xl py-3 text-xs sm:text-sm font-semibold text-slate-600 peer-checked:bg-navy peer-checked:text-white">⚙️ Admin</span>
+                    </label>
+                </div>
+
+                <label class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-2">Email or username</label>
+                <input type="text" name="email" value="{{ request.POST.email|default:'' }}" autocomplete="username" required placeholder="you@example.com" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigoCustom/30 focus:border-indigoCustom text-sm mb-4">
+
+                <label class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-2">Password</label>
+                <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigoCustom/30 focus:border-indigoCustom text-sm">
+
+                <div class="flex items-center justify-between mt-3 mb-6 text-xs">
+                    <label class="flex items-center gap-2 text-slate-500"><input type="checkbox" name="remember_me" class="rounded"> Remember me</label>
+                    <span class="text-slate-400">Use the role linked to your account</span>
+                </div>
+
+                <button class="w-full bg-navy text-white font-semibold py-3.5 rounded-xl hover:bg-indigoCustom transition">Log In</button>
+            </form>
+
+            <div class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="{% url 'register' %}" class="text-indigoCustom font-semibold hover:underline">Create one</a></div>
+
+            <div class="mt-6 bg-mint border border-emerald-100 p-4 rounded-2xl flex gap-3 text-xs text-slate-600">
+                <span>🔒</span><span><b>Role security:</b> selecting a different tab cannot change your actual account role. The server checks the role stored on your account before login.</span>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
