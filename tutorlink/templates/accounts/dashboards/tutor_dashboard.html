@@ -1,0 +1,21 @@
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+{% block title %}Tutor Dashboard{% endblock %}
+{% block heading %}Tutor Home{% endblock %}
+{% block nav %}
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tuition</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">My Applications</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">My Profile</a>
+{% endblock %}
+{% block content %}
+<div class="bg-white border rounded-3xl p-7 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+    <div><span class="inline-flex px-3 py-1 rounded-full bg-mint text-success text-xs font-bold">TUTOR ACCOUNT</span><h2 class="text-3xl font-bold font-serif text-navy mt-3">Find tuition opportunities.</h2><p class="text-sm text-slate-500 mt-2 max-w-2xl">Browse open tuition posts, review match percentages and apply to suitable students.</p></div>
+    <a href="#" class="px-5 py-3 rounded-xl bg-navy text-white text-sm font-semibold">Find Tuition</a>
+</div>
+<div class="grid sm:grid-cols-3 gap-4 mb-6">
+<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Profile</p><p class="text-2xl font-bold text-navy mt-2">{{ user.get_full_name|default:user.username }}</p><p class="text-xs text-slate-500 mt-1">Keep education and availability updated.</p></div>
+<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Verification</p><p class="text-2xl font-bold text-navy mt-2">{% if user.is_verified %}Verified{% else %}Pending{% endif %}</p><p class="text-xs text-slate-500 mt-1">Admin verification status.</p></div>
+<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Mode</p><p class="text-2xl font-bold text-navy mt-2">Online-first</p><p class="text-xs text-slate-500 mt-1">Demo before offline tuition.</p></div>
+</div>
+{% endblock %}
