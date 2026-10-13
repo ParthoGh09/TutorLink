@@ -98,6 +98,8 @@ def student_dashboard(request):
     context = {
         'user': request.user,
         'role_name': 'Student',
+        'location': 'Dhanmondi, Dhaka', # placeholder,use the real profile area later
+        'badges': {'applications': 2, 'demos': 1, 'messages': 2}, # placeholders
     }
     return render(request, 'accounts/dashboards/student_dashboard.html', context)
 
