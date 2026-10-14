@@ -37,7 +37,34 @@
     </header>
 
     <div class="flex gap-5 p-6">
-        <!-- SIDEBAR -->
+       <aside class="w-60 bg-navy text-white rounded-2xl p-4 self-start">
+            <a href="#" class="block text-center bg-coral font-semibold py-3 rounded-xl mb-4">
+                + Post a Tuition Need
+            </a>
+            <nav class="space-y-1 text-sm">
+                <a href="{% url 'student_dashboard' %}" class="block px-3 py-2 rounded-lg bg-indigoCustom">Home</a>
+                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">My Tuition Posts</a>
+                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    Applications <span class="bg-coral text-xs rounded-full px-2">{{ badges.applications }}</span>
+                </a>
+                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    Demo Classes <span class="bg-coral text-xs rounded-full px-2">{{ badges.demos }}</span>
+                </a>
+                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    Messages <span class="bg-coral text-xs rounded-full px-2">{{ badges.messages }}</span>
+                </a>
+                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">History</a>
+                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Report</a>
+                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Saved Tutors</a>
+                <hr class="border-white/20 my-2">
+                <a href="{% url 'logout' %}" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Logout</a>
+            </nav>
+            <div class="mt-6 bg-indigoCustom/50 rounded-xl p-3 text-center text-sm">
+                <div class="font-semibold">Learn safely</div>
+                <div class="text-xs text-white/70">Online demo first, offline later.</div>
+            </div>
+        </aside>
+
         <!-- MAIN -->
     </div>
 
