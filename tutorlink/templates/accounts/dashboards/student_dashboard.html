@@ -25,7 +25,16 @@
 </head>
 <body class="bg-[#EEF1F8] text-navy min-h-screen">
 
-    <!-- TOPBAR -->
+    <header claas="bg-white flex items-center gap-4 px-6 py-3 shadow-sm">
+        <div class="font-lora text-2xl">Tutor<span class="text-coral">Link</span></div>
+        <div class="border rounded-xl px-3 py-1.5 text-sm">📍 {{ location }}</div>
+        <input type="text" placeholder="Search tutors, posts, subjects..."
+               class="flex-1 border rounded-xl px-4 py-2 text-sm">
+        <div class="text-sm text-right">
+            <div class="font-semibold">{{ user.get_full_name|default:user.username }}</div>
+            <div class="text-xs text-gray-500">{{ role_name }}</div>
+        </div>
+    </header>
 
     <div class="flex gap-5 p-6">
         <!-- SIDEBAR -->
