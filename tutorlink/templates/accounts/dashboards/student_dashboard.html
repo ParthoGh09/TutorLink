@@ -112,46 +112,60 @@
             </a>
         </aside>
 
-       <main class="flex-1 bg-white rounded-2xl p-6">
-           <div class="flex justify-between items-center mb-4">
-               <h2 class="font-semibold">Main Features</h2>
-               <span class="bg-mint text-success text-xs font-semibold px-3 py-1 rounded-full">✓ Verified student</span>
-           </div>
-           <div class="grid grid-cols-6 gap-4">
-               <a href="#" class="col-span-2 bg-mint rounded-2xl p-8 text-center hover:shadow-md">
-                   <div class="text-4xl mb-2">🎓</div>
-                   <h3 class="font-semibold">Find Tutors</h3>
-                   <p class="text-xs text-gray-500">Browse verified tutors near you</p>
-               </a>
-               <a href="#" class="col-span-2 bg-sunshine/40 rounded-2xl p-8 text-center hover:shadow-md">
-                    <div class="text-4xl mb-2">✨</div>
-                    <h3 class="font-semibold">Smart Match</h3>
-                    <p class="text-xs text-gray-500">Best tutors scored for your needs</p>
+       <main class="flex-1 bg-white rounded-2xl p-5 border border-gray-100">
+            <div class="flex items-center justify-between text-sm border-b pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-coral"></i>
+                    <span><b>Location:</b> {{ location }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1 font-semibold"><i data-lucide="bell" class="w-4 h-4"></i> Notifications</span>
+                    <input type="text" placeholder="Search..." class="border rounded-lg px-3 py-1.5 text-xs">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-semibold text-sm flex items-center gap-2">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> Main Features</h2>
+                <span class="flex items-center gap-1 bg-mint text-success text-[11px] font-semibold px-3 py-1 rounded-full">
+                    <i data-lucide="shield-check" class="w-3 h-3"></i> Verified student</span>
+            </div>
+
+            <div class="grid grid-cols-6 gap-4">
+                <a href="#" class="col-span-2 bg-mint rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-8 h-8 text-navy"></i></div>
+                    <h3 class="font-semibold text-sm">Find Tutors</h3>
+                    <p class="text-[11px] text-gray-500">Browse verified tutors near you</p>
                 </a>
-                <a href="#" class="col-span-2 bg-red-100 rounded-2xl p-8 text-center hover:shadow-md">
-                    <div class="text-4xl mb-2">📖</div>
-                    <h3 class="font-semibold">Tuition Posts</h3>
-                    <p class="text-xs text-gray-500">Browse or manage posts</p>
+                <a href="#" class="col-span-2 relative bg-[#FFF6CC] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <span class="absolute top-3 right-4 text-[10px] font-semibold text-yellow-700">New</span>
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-yellow-600"></i></div>
+                    <h3 class="font-semibold text-sm">Smart Match</h3>
+                    <p class="text-[11px] text-gray-500">Best tutors scored for your needs</p>
                 </a>
-                <a href="#" class="col-span-3 bg-indigo-100 rounded-2xl p-8 text-center hover:shadow-md">
-                    <div class="text-4xl mb-2">🎥</div>
-                    <h3 class="font-semibold">Demo Classes</h3>
-                    <p class="text-xs text-gray-500">Schedule your online demo</p>
+                <a href="#" class="col-span-2 bg-[#FDE4E2] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-8 h-8 text-coral"></i></div>
+                    <h3 class="font-semibold text-sm">Tuition Posts</h3>
+                    <p class="text-[11px] text-gray-500">Browse or manage posts</p>
                 </a>
-                <a href="#" class="col-span-3 bg-purple-100 rounded-2xl p-8 text-center hover:shadow-md">
-                    <div class="text-4xl mb-2">🗺️</div>
-                    <h3 class="font-semibold">Live Location</h3>
-                    <p class="text-xs text-gray-500">Share location for offline meets</p>
+                <a href="#" class="col-span-3 bg-[#E4E9FF] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="video" class="w-8 h-8 text-indigoCustom"></i></div>
+                    <h3 class="font-semibold text-sm">Demo Classes</h3>
+                    <p class="text-[11px] text-gray-500">Schedule your online demo</p>
+                </a>
+                <a href="#" class="col-span-3 bg-[#EDE5F7] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="map" class="w-8 h-8 text-purple-600"></i></div>
+                    <h3 class="font-semibold text-sm">Live Location</h3>
+                    <p class="text-[11px] text-gray-500">Share location for offline meets</p>
                 </a>
             </div>
 
-            <div class="mt-4 bg-[#F4F5FA] rounded-xl p-4 flex justify-between items-center">
-                <div>
-                    <div class="font-semibold text-sm">Upcoming demo · Math with Tanvir Hasan</div>
-                    <div class="text-xs text-gray-500">Tomorrow, 5:00 PM · Google Meet</div>
-                </div>
-                 <a href="#" class="bg-navy text-white text-sm font-semibold px-4 py-2 rounded-lg">Join Demo</a>
-            </div>
+
         </main>
 
 
