@@ -66,32 +66,50 @@
     </header>
 
     <div class="flex gap-5 p-6">
-       <aside class="w-60 bg-navy text-white rounded-2xl p-4 self-start">
-            <a href="#" class="block text-center bg-coral font-semibold py-3 rounded-xl mb-4">
-                + Post a Tuition Need
+       <aside class="w-56 bg-navy text-white rounded-2xl p-4 self-start">
+            <a href="#" class="flex items-center justify-center gap-1 bg-coral font-semibold text-sm py-3 rounded-xl mb-4">
+                <i data-lucide="plus" class="w-4 h-4"></i> Post a Tuition Need
             </a>
             <nav class="space-y-1 text-sm">
-                <a href="{% url 'student_dashboard' %}" class="block px-3 py-2 rounded-lg bg-indigoCustom">Home</a>
-                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">My Tuition Posts</a>
-                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
-                    Applications <span class="bg-coral text-xs rounded-full px-2">{{ badges.applications }}</span>
-                </a>
-                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
-                    Demo Classes <span class="bg-coral text-xs rounded-full px-2">{{ badges.demos }}</span>
-                </a>
-                <a href="#" class="flex justify-between px-3 py-2 rounded-lg hover:bg-indigoCustom">
-                    Messages <span class="bg-coral text-xs rounded-full px-2">{{ badges.messages }}</span>
-                </a>
-                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">History</a>
-                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Report</a>
-                <a href="#" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Saved Tutors</a>
+                <a href="{% url 'student_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigoCustom">
+                    <i data-lucide="house" class="w-4 h-4"></i> Home</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> My Tuition Posts</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="users" class="w-4 h-4"></i> Applications
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.applications }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="video" class="w-4 h-4"></i> Demo Classes
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.demos }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i> Messages
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.messages }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="history" class="w-4 h-4"></i> History</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="flag" class="w-4 h-4"></i> Report</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i> Saved Tutors</a>
                 <hr class="border-white/20 my-2">
-                <a href="{% url 'logout' %}" class="block px-3 py-2 rounded-lg hover:bg-indigoCustom">Logout</a>
+                <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout</a>
             </nav>
-            <div class="mt-6 bg-indigoCustom/50 rounded-xl p-3 text-center text-sm">
-                <div class="font-semibold">Learn safely</div>
-                <div class="text-xs text-white/70">Online demo first, offline later.</div>
+
+            <div class="mt-5 bg-indigoCustom/40 rounded-xl p-4 text-center">
+                <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-mint flex items-center justify-center">
+                    <i data-lucide="user" class="w-8 h-8 text-navy"></i>
+                </div>
+                <div class="font-semibold text-sm">Learn safely</div>
+                <div class="text-[11px] text-white/70">Online demo first, offline later.</div>
             </div>
+            <a href="#" class="mt-3 flex items-center gap-3 bg-indigoCustom/40 rounded-xl p-3 text-sm">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                <div class="leading-tight">
+                    <div class="font-semibold">Need Help?</div>
+                    <div class="text-[11px] text-sunshine">Contact Us</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+            </a>
         </aside>
 
        <main class="flex-1 bg-white rounded-2xl p-6">
