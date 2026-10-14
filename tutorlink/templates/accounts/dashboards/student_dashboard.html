@@ -23,17 +23,46 @@
         .font-lora { font-family: 'Lora', serif; }
     </style>
 </head>
-<body class="bg-[#EEF1F8] text-navy min-h-screen">
+<body class="bg-[#EEF1F8] text-navy min-h-screen p-6">
+  <div class="max-w-6xl mx-auto bg-[#F7F9FC] rounded-3xl shadow-xl overflow-hidden">
 
-    <header claas="bg-white flex items-center gap-4 px-6 py-3 shadow-sm">
-        <div class="font-lora text-2xl">Tutor<span class="text-coral">Link</span></div>
-        <div class="border rounded-xl px-3 py-1.5 text-sm">📍 {{ location }}</div>
-        <input type="text" placeholder="Search tutors, posts, subjects..."
-               class="flex-1 border rounded-xl px-4 py-2 text-sm">
-        <div class="text-sm text-right">
-            <div class="font-semibold">{{ user.get_full_name|default:user.username }}</div>
-            <div class="text-xs text-gray-500">{{ role_name }}</div>
+    <header class="bg-white flex items-center gap-3 px-6 py-3 border-b border-gray-100">
+        <div class="flex items-center gap-2 mr-2">
+            <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-sunshine"></i>
+            </div>
+            <div>
+                <div class="font-lora text-xl leading-none">Tutor<span class="text-coral">Link</span></div>
+                <div class="text-[9px] text-gray-500">Connect | Learn | Earn | Safety</div>
+            </div>
         </div>
+        <div class="flex items-center gap-2 border rounded-xl px-3 py-1.5">
+            <i data-lucide="map-pin" class="w-4 h-4 text-coral"></i>
+            <div class="leading-tight">
+                <div class="text-[10px] text-gray-500">Current Location</div>
+                <div class="text-sm font-semibold">{{ location }}</div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </div>
+        <button class="flex items-center gap-1 border rounded-xl px-3 py-2 text-sm font-semibold">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Location
+        </button>
+        <div class="flex flex-1 border rounded-xl overflow-hidden">
+            <input type="text" placeholder="Search tutors, posts, subjects..." class="flex-1 px-3 py-2 text-sm outline-none">
+            <button class="bg-navy text-white px-4"><i data-lucide="search" class="w-4 h-4"></i></button>
+        </div>
+        <div class="relative"><i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-coral rounded-full"></span></div>
+        <div class="relative"><i data-lucide="message-circle" class="w-5 h-5"></i>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-coral rounded-full"></span></div>
+        <div class="w-9 h-9 rounded-full bg-coral/20 text-coral flex items-center justify-center font-semibold text-sm">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+        <div class="leading-tight">
+            <div class="text-sm font-semibold">{{ user.get_full_name|default:user.username }}</div>
+            <div class="text-[10px] text-gray-500">{{ role_name }}</div>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4"></i>
     </header>
 
     <div class="flex gap-5 p-6">
@@ -103,7 +132,7 @@
                     <div class="font-semibold text-sm">Upcoming demo · Math with Tanvir Hasan</div>
                     <div class="text-xs text-gray-500">Tomorrow, 5:00 PM · Google Meet</div>
                 </div>
-                 <a herf="#" class="bg-navy text-white text-sm font-semibold px-4 py-2 rounded-lg">Join Demo</a>
+                 <a href="#" class="bg-navy text-white text-sm font-semibold px-4 py-2 rounded-lg">Join Demo</a>
             </div>
         </main>
 
@@ -111,5 +140,8 @@
 
     </div>
 
+</div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>
