@@ -1,25 +1,191 @@
-{% extends 'accounts/dashboards/base_dashboard.html' %}
-{% block title %}Student Dashboard{% endblock %}
-{% block heading %}Student Home{% endblock %}
-{% block nav %}
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Post a Tuition Need</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tutors</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Applications</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
-{% endblock %}
-{% block content %}
-<div class="bg-navy text-white rounded-3xl p-7 md:p-9 mb-6">
-    <p class="text-sm text-slate-300">Welcome back, {{ user.first_name|default:user.username }} 👋</p>
-    <h2 class="text-3xl font-bold font-serif mt-1">Find a tutor who fits your needs.</h2>
-    <p class="text-sm text-slate-300 mt-3 max-w-2xl">Search verified tutors, publish a tuition need and use the online-first demo flow described in the TutorLink design.</p>
-    <div class="mt-6 flex flex-wrap gap-3"><a href="#" class="px-4 py-2.5 rounded-xl bg-sunshine text-navy text-sm font-bold">Find Tutors</a><a href="#" class="px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-semibold">Post a Tuition Need</a></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Home | TutorLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#1F2A5C', indigoCustom: '#2E3C86', coral: '#FF6B5B',
+                        mint: '#E7F8F1', sunshine: '#FBE77B', success: '#12A783'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .font-lora { font-family: 'Lora', serif; }
+    </style>
+</head>
+<body class="bg-[#EEF1F8] text-navy min-h-screen p-6">
+  <div class="max-w-6xl mx-auto bg-[#F7F9FC] rounded-3xl shadow-xl overflow-hidden">
+
+    <header class="bg-white flex items-center gap-3 px-6 py-3 border-b border-gray-100">
+        <div class="flex items-center gap-2 mr-2">
+            <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-sunshine"></i>
+            </div>
+            <div>
+                <div class="font-lora text-xl leading-none">Tutor<span class="text-coral">Link</span></div>
+                <div class="text-[9px] text-gray-500">Connect | Learn | Earn | Safety</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 border rounded-xl px-3 py-1.5">
+            <i data-lucide="map-pin" class="w-4 h-4 text-coral"></i>
+            <div class="leading-tight">
+                <div class="text-[10px] text-gray-500">Current Location</div>
+                <div class="text-sm font-semibold">{{ location }}</div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </div>
+        <button class="flex items-center gap-1 border rounded-xl px-3 py-2 text-sm font-semibold">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Location
+        </button>
+        <div class="flex flex-1 border rounded-xl overflow-hidden">
+            <input type="text" placeholder="Search tutors, posts, subjects..." class="flex-1 px-3 py-2 text-sm outline-none">
+            <button class="bg-navy text-white px-4"><i data-lucide="search" class="w-4 h-4"></i></button>
+        </div>
+        <div class="relative"><i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-coral rounded-full"></span></div>
+        <div class="relative"><i data-lucide="message-circle" class="w-5 h-5"></i>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-coral rounded-full"></span></div>
+        <div class="w-9 h-9 rounded-full bg-coral/20 text-coral flex items-center justify-center font-semibold text-sm">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+        <div class="leading-tight">
+            <div class="text-sm font-semibold">{{ user.get_full_name|default:user.username }}</div>
+            <div class="text-[10px] text-gray-500">{{ role_name }}</div>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+    </header>
+
+    <div class="flex gap-5 p-6">
+       <aside class="w-56 bg-navy text-white rounded-2xl p-4 self-start">
+            <a href="#" class="flex items-center justify-center gap-1 bg-coral font-semibold text-sm py-3 rounded-xl mb-4">
+                <i data-lucide="plus" class="w-4 h-4"></i> Post a Tuition Need
+            </a>
+            <nav class="space-y-1 text-sm">
+                <a href="{% url 'student_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigoCustom">
+                    <i data-lucide="house" class="w-4 h-4"></i> Home</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> My Tuition Posts</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="users" class="w-4 h-4"></i> Applications
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.applications }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="video" class="w-4 h-4"></i> Demo Classes
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.demos }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i> Messages
+                    <span class="ml-auto bg-coral text-[10px] rounded-full px-1.5">{{ badges.messages }}</span></a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="history" class="w-4 h-4"></i> History</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="flag" class="w-4 h-4"></i> Report</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i> Saved Tutors</a>
+                <hr class="border-white/20 my-2">
+                <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigoCustom">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout</a>
+            </nav>
+
+            <div class="mt-5 bg-indigoCustom/40 rounded-xl p-4 text-center">
+                <div class="w-16 h-16 mx-auto mb-2 rounded-full bg-mint flex items-center justify-center">
+                    <i data-lucide="user" class="w-8 h-8 text-navy"></i>
+                </div>
+                <div class="font-semibold text-sm">Learn safely</div>
+                <div class="text-[11px] text-white/70">Online demo first, offline later.</div>
+            </div>
+            <a href="#" class="mt-3 flex items-center gap-3 bg-indigoCustom/40 rounded-xl p-3 text-sm">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                <div class="leading-tight">
+                    <div class="font-semibold">Need Help?</div>
+                    <div class="text-[11px] text-sunshine">Contact Us</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+            </a>
+        </aside>
+
+       <main class="flex-1 bg-white rounded-2xl p-5 border border-gray-100">
+            <div class="flex items-center justify-between text-sm border-b pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-coral"></i>
+                    <span><b>Location:</b> {{ location }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1 font-semibold"><i data-lucide="bell" class="w-4 h-4"></i> Notifications</span>
+                    <input type="text" placeholder="Search..." class="border rounded-lg px-3 py-1.5 text-xs">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-semibold text-sm flex items-center gap-2">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> Main Features</h2>
+                <span class="flex items-center gap-1 bg-mint text-success text-[11px] font-semibold px-3 py-1 rounded-full">
+                    <i data-lucide="shield-check" class="w-3 h-3"></i> Verified student</span>
+            </div>
+
+            <div class="grid grid-cols-6 gap-4">
+                <a href="#" class="col-span-2 bg-mint rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-8 h-8 text-navy"></i></div>
+                    <h3 class="font-semibold text-sm">Find Tutors</h3>
+                    <p class="text-[11px] text-gray-500">Browse verified tutors near you</p>
+                </a>
+                <a href="#" class="col-span-2 relative bg-[#FFF6CC] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <span class="absolute top-3 right-4 text-[10px] font-semibold text-yellow-700">New</span>
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-yellow-600"></i></div>
+                    <h3 class="font-semibold text-sm">Smart Match</h3>
+                    <p class="text-[11px] text-gray-500">Best tutors scored for your needs</p>
+                </a>
+                <a href="#" class="col-span-2 bg-[#FDE4E2] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-8 h-8 text-coral"></i></div>
+                    <h3 class="font-semibold text-sm">Tuition Posts</h3>
+                    <p class="text-[11px] text-gray-500">Browse or manage posts</p>
+                </a>
+                <a href="#" class="col-span-3 bg-[#E4E9FF] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="video" class="w-8 h-8 text-indigoCustom"></i></div>
+                    <h3 class="font-semibold text-sm">Demo Classes</h3>
+                    <p class="text-[11px] text-gray-500">Schedule your online demo</p>
+                </a>
+                <a href="#" class="col-span-3 bg-[#EDE5F7] rounded-2xl border border-gray-100 py-7 text-center hover:shadow-md">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-white rounded-2xl shadow flex items-center justify-center">
+                        <i data-lucide="map" class="w-8 h-8 text-purple-600"></i></div>
+                    <h3 class="font-semibold text-sm">Live Location</h3>
+                    <p class="text-[11px] text-gray-500">Share location for offline meets</p>
+                </a>
+            </div>
+
+            <div class="mt-4 bg-[#F4F5FA] rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 bg-[#E4E9FF] rounded-lg flex items-center justify-center">
+                    <i data-lucide="calendar" class="w-4 h-4 text-indigoCustom"></i></div>
+                <div class="leading-tight">
+                    <div class="font-semibold text-xs">Upcoming demo · Math with Tanvir Hasan</div>
+                    <div class="text-[11px] text-gray-500">Tomorrow, 5:00 PM · Google Meet</div>
+                </div>
+                <a href="#" class="ml-auto bg-navy text-white text-xs font-semibold px-4 py-2 rounded-lg">Join Demo</a>
+            </div>
+            <button class="mt-3 w-full bg-[#F0F4F8] rounded-lg py-2 text-xs font-semibold flex justify-center items-center gap-1">
+                more <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+        </main>
+    </div>
+
+      <footer class="flex justify-between text-[11px] text-gray-500 px-6 pb-4">
+        <span>© 2026 TutorLink. All rights reserved.</span>
+        <span>About Us | Contact Us | Privacy Policy | Terms of Use</span>
+    </footer>
+
 </div>
-<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-{% for item in "Find Tutors,Post Tuition Need,Applications,Demo Classes"|make_list %}{% endfor %}
-<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">🔎</div><h3 class="font-bold text-navy mt-3">Find Tutors</h3><p class="text-xs text-slate-500 mt-1">Filter by subject, level, budget and area.</p></div>
-<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📝</div><h3 class="font-bold text-navy mt-3">Tuition Post</h3><p class="text-xs text-slate-500 mt-1">Publish your requirement and trigger matching.</p></div>
-<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📋</div><h3 class="font-bold text-navy mt-3">Applications</h3><p class="text-xs text-slate-500 mt-1">Track tutor applications and decisions.</p></div>
-<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">💻</div><h3 class="font-bold text-navy mt-3">Demo Classes</h3><p class="text-xs text-slate-500 mt-1">Manage your mandatory online demo.</p></div>
-</div>
-{% endblock %}
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
