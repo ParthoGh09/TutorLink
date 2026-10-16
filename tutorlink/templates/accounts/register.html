@@ -5,148 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - TutorLink</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: '#1F2A5C',
-                        indigoCustom: '#263086',
-                        coral: '#FF6858',
-                        mint: '#E7FBF1',
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 py-8">
 
-    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden p-8 md:p-12">
+<body class="bg-gray-100 p-4">
 
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <div>
-                <h1 class="text-2xl font-bold font-serif text-navy">Create your account</h1>
-                <p class="text-sm text-slate-500">Join as a student or tutor. Verification unlocks contact and demo features.</p>
-            </div>
-            <a href="{% url 'login' %}" class="text-xs text-indigoCustom font-semibold hover:underline">Already have an account? Log In</a>
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="bg-red-100 text-red-700 text-sm p-3 rounded-xl mb-6">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST" enctype="multipart/form-data" action="{% url 'register' %}">
-            {% csrf_token %}
-
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">I want to join as</label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <label class="border-2 border-slate-200 p-4 rounded-2xl cursor-pointer hover:border-navy flex items-start space-x-3">
-                    <input type="radio" name="role" value="STUDENT" checked class="mt-1 text-navy focus:ring-navy" onclick="toggleRoleFields('STUDENT')">
-                    <div>
-                        <h4 class="font-bold text-navy text-sm">Student</h4>
-                        <p class="text-xs text-slate-500">Post tuition needs, find verified tutors, book a demo.</p>
-                    </div>
-                </label>
-                <label class="border-2 border-slate-200 p-4 rounded-2xl cursor-pointer hover:border-navy flex items-start space-x-3">
-                    <input type="radio" name="role" value="TUTOR" class="mt-1 text-navy focus:ring-navy" onclick="toggleRoleFields('TUTOR')">
-                    <div>
-                        <h4 class="font-bold text-navy text-sm">Tutor</h4>
-                        <p class="text-xs text-slate-500">Create a profile, find genuine tuition, get rated.</p>
-                    </div>
-                </label>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Full Name</label>
-                    <input type="text" name="full_name" required placeholder="Ayesha Rahman" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Email</label>
-                    <input type="email" name="email" required placeholder="ayesha.rahman@gmail.com" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy text-sm outline-none">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Phone</label>
-                    <input type="text" name="phone" required placeholder="+880 1712-345678" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password</label>
-                    <input type="password" name="password" required placeholder="••••••••" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Confirm Password</label>
-                    <input type="password" name="confirm_password" required placeholder="••••••••" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy text-sm outline-none">
-                </div>
-            </div>
-
-            <div id="student-fields" class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-200">
-                <h4 class="text-xs font-bold uppercase text-navy mb-3">Student Profile Details</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Institution</label>
-                        <input type="text" name="institution" placeholder="Dhanmondi Govt. Girls' High School" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Academic Level</label>
-                        <input type="text" name="academic_level" placeholder="Class 10" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Monthly Budget (৳)</label>
-                        <input type="number" name="monthly_budget" placeholder="6000" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Division</label>
-                    <input type="text" name="division" value="Dhaka" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">District</label>
-                    <input type="text" name="district" value="Dhaka" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Preferred Location (Area)</label>
-                    <input type="text" name="area" required placeholder="Dhanmondi" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none">
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Short Bio</label>
-                <textarea name="bio" rows="2" placeholder="Tell tutors about your goals, weak areas, and study style..." class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none"></textarea>
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Profile Picture (Optional)</label>
-                <input type="file" name="profile_picture" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-navy file:text-white">
-            </div>
-
-            <div class="bg-mint p-4 rounded-2xl flex items-center justify-between mb-6">
-                <div class="flex items-center space-x-2 text-xs text-slate-700">
-                    <span>🔒</span>
-                    <span>Exact address stays hidden — only area is shown publicly.</span>
-                </div>
-                <button type="submit" class="bg-navy text-white font-semibold px-6 py-3 rounded-xl hover:bg-opacity-90 transition text-sm">Continue to Verification &gt;</button>
-            </div>
-
-        </form>
-
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-700">Create Account</h1>
+        <a href="{% url 'login' %}" class="text-blue-600 text-sm">Log In</a>
     </div>
 
-    <script>
-        function toggleRoleFields(role) {
-            const studentFields = document.getElementById('student-fields');
-            studentFields.style.display = (role === 'STUDENT') ? 'block' : 'none';
-        }
-    </script>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="bg-red-100 text-red-700 p-3 rounded mb-4">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        <label class="block mb-2 font-semibold">Join as</label>
+        <div class="flex gap-6 mb-4">
+            <label>
+                <input type="radio" name="role" value="STUDENT" checked
+                       onclick="toggleRoleFields('STUDENT')">
+                Student
+            </label>
+
+            <label>
+                <input type="radio" name="role" value="TUTOR"
+                       onclick="toggleRoleFields('TUTOR')">
+                Tutor
+            </label>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <input class="border p-3 rounded w-full" type="text"
+                   name="full_name" placeholder="Full Name" required>
+
+            <input class="border p-3 rounded w-full" type="email"
+                   name="email" placeholder="Email" required>
+
+            <input class="border p-3 rounded w-full" type="text"
+                   name="phone" placeholder="Phone Number" required>
+
+            <input class="border p-3 rounded w-full" type="password"
+                   name="password" placeholder="Password" required>
+
+            <input class="border p-3 rounded w-full" type="password"
+                   name="confirm_password" placeholder="Confirm Password" required>
+        </div>
+
+        <div id="student-fields" class="mt-5 p-4 bg-gray-50 rounded">
+            <h3 class="font-semibold text-blue-700 mb-3">Student Details</h3>
+
+            <div class="grid md:grid-cols-3 gap-4">
+                <input class="border p-3 rounded w-full" type="text"
+                       name="institution" placeholder="Institution">
+
+                <input class="border p-3 rounded w-full" type="text"
+                       name="academic_level" placeholder="Academic Level">
+
+                <input class="border p-3 rounded w-full" type="number"
+                       name="monthly_budget" placeholder="Monthly Budget (৳)">
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-4">
+            <input class="border p-3 rounded w-full" type="text"
+                   name="division" value="Dhaka" placeholder="Division">
+
+            <input class="border p-3 rounded w-full" type="text"
+                   name="district" value="Dhaka" placeholder="District">
+
+            <input class="border p-3 rounded w-full" type="text"
+                   name="area" placeholder="Preferred Area" required>
+        </div>
+
+        <textarea class="border p-3 rounded w-full mt-4"
+                  name="bio" rows="3"
+                  placeholder="Short Bio"></textarea>
+
+        <label class="block mt-4 mb-2">Profile Picture (Optional)</label>
+        <input type="file" name="profile_picture" accept="image/*">
+
+        <p class="text-sm text-gray-500 mt-4">
+            Your exact address stays private.
+        </p>
+
+        <button type="submit"
+                class="w-full bg-blue-600 text-white p-3 rounded mt-4 hover:bg-blue-700">
+            Continue to Verification
+        </button>
+    </form>
+</div>
+
+<script>
+    function toggleRoleFields(role) {
+        document.getElementById('student-fields').style.display =
+            role === 'STUDENT' ? 'block' : 'none';
+    }
+</script>
+
 </body>
 </html>
