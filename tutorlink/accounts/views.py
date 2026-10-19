@@ -1,131 +1,96 @@
-from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import render, redirect
 
 from .models import User, VerificationDocument
 
 
-def get_effective_role(user):
-    """Return the role used by the application for routing/authorization."""
-    if user.is_superuser:
-        return User.Role.ADMIN
-    return user.role
-
-
-def role_required(*allowed_roles):
-    """Protect a view so users can only access their own role area."""
-    def decorator(view_func):
-        @wraps(view_func)
-        @login_required
-        def wrapped(request, *args, **kwargs):
-            if get_effective_role(request.user) not in allowed_roles:
-                messages.error(request, "You do not have permission to access that page.")
-                return redirect('role_dashboard')
-            return view_func(request, *args, **kwargs)
-        return wrapped
-    return decorator
-
-
 def login_view(request):
-    # Already logged-in users should never be sent back to verification/login.
     if request.user.is_authenticated:
         return redirect('role_dashboard')
 
     if request.method == 'POST':
-        identifier = request.POST.get('email', '').strip()
+        username = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
-        selected_role = request.POST.get('role', User.Role.STUDENT).upper().strip()
+        role = request.POST.get('role', 'STUDENT').upper().strip()
 
-        valid_roles = {choice[0] for choice in User.Role.choices}
-        if selected_role not in valid_roles:
-            messages.error(request, "Please select a valid account role.")
-            return render(request, 'accounts/login.html', {'selected_role': User.Role.STUDENT})
-
-        if not identifier or not password:
-            messages.error(request, "Please enter your username/email and password.")
-            return render(request, 'accounts/login.html', {'selected_role': selected_role})
-
-        # The project uses username=email for registered accounts, but this also
-        # supports users created directly from Django Admin with a different username.
-        user = authenticate(request, username=identifier, password=password)
+        user = authenticate(request, username=username, password=password)
 
         if user is None:
-            user_obj = User.objects.filter(email__iexact=identifier).first()
-            if user_obj:
-                user = authenticate(request, username=user_obj.username, password=password)
+            account = User.objects.filter(email__iexact=username).first()
+
+            if account:
+                user = authenticate(
+                    request,
+                    username=account.username,
+                    password=password
+                )
 
         if user is None:
-            messages.error(request, "Invalid username/email or password.")
-            return render(request, 'accounts/login.html', {'selected_role': selected_role})
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'accounts/login.html')
 
         if not user.is_active:
-            messages.error(request, "This account is inactive. Please contact an administrator.")
-            return render(request, 'accounts/login.html', {'selected_role': selected_role})
+            messages.error(request, 'Your account is inactive.')
+            return render(request, 'accounts/login.html')
 
-        actual_role = get_effective_role(user)
-        if actual_role != selected_role:
-            messages.error(
-                request,
-                f"This account is registered as {user.get_role_display() if not user.is_superuser else 'Administrator'}. "
-                f"Please select the {dict(User.Role.choices)[actual_role]} login tab."
-            )
-            return render(request, 'accounts/login.html', {'selected_role': selected_role})
+        actual_role = 'ADMIN' if user.is_superuser else user.role
+
+        if role != actual_role:
+            messages.error(request, 'Please select the correct role.')
+            return render(request, 'accounts/login.html')
+
+        if role == 'ADMIN' and not user.is_staff:
+            messages.error(request, 'You do not have admin access.')
+            return render(request, 'accounts/login.html')
 
         login(request, user)
         return redirect('role_dashboard')
 
-    return render(request, 'accounts/login.html', {'selected_role': User.Role.STUDENT})
+    return render(request, 'accounts/login.html')
 
 
+@login_required
 def role_dashboard(request):
-    """Route an authenticated user to the dashboard for their effective role."""
-    if not request.user.is_authenticated:
-        return redirect('login')
+    user = request.user
+    role = 'ADMIN' if user.is_superuser else user.role
 
-    role = get_effective_role(request.user)
-    if role == User.Role.ADMIN:
-        return redirect('admin_dashboard')
-    if role == User.Role.TUTOR:
+    if role == 'ADMIN':
+        return redirect('/admin/')
+    elif role == 'TUTOR':
         return redirect('tutor_dashboard')
+
     return redirect('student_dashboard')
 
 
-@role_required(User.Role.STUDENT)
+@login_required
 def student_dashboard(request):
-    context = {
+    if request.user.role != User.Role.STUDENT:
+        return redirect('role_dashboard')
+
+    return render(request, 'accounts/dashboards/student_dashboard.html', {
         'user': request.user,
         'role_name': 'Student',
-        'location': 'Dhanmondi, Dhaka', # placeholder,use the real profile area later
-        'badges': {'applications': 2, 'demos': 1, 'messages': 2}, # placeholders
-    }
-    return render(request, 'accounts/dashboards/student_dashboard.html', context)
+        'location': 'Dhanmondi, Dhaka',  # Placeholder
+        'badges': {
+            'applications': 2,
+            'demos': 1,
+            'messages': 2,
+        },  # Placeholder counts
+    })
 
 
-@role_required(User.Role.TUTOR)
+@login_required
 def tutor_dashboard(request):
-    context = {
+    if request.user.role != User.Role.TUTOR:
+        return redirect('role_dashboard')
+
+    return render(request, 'accounts/dashboards/tutor_dashboard.html', {
         'user': request.user,
         'role_name': 'Tutor',
-    }
-    return render(request, 'accounts/dashboards/tutor_dashboard.html', context)
-
-
-@role_required(User.Role.ADMIN)
-def admin_dashboard(request):
-    context = {
-        'user': request.user,
-        'role_name': 'Administrator',
-        'total_users': User.objects.count(),
-        'students': User.objects.filter(role=User.Role.STUDENT).count(),
-        'tutors': User.objects.filter(role=User.Role.TUTOR).count(),
-        'pending_verifications': VerificationDocument.objects.filter(
-            status=VerificationDocument.Status.PENDING
-        ).count(),
-    }
-    return render(request, 'accounts/dashboards/admin_dashboard.html', context)
+    })
 
 
 def register_view(request):
@@ -133,108 +98,106 @@ def register_view(request):
         return redirect('role_dashboard')
 
     if request.method == 'POST':
-        role = request.POST.get('role', User.Role.STUDENT).upper().strip()
-
-        # Public registration is intentionally limited to Student/Tutor.
-        if role not in {User.Role.STUDENT, User.Role.TUTOR}:
-            messages.error(request, "Administrator accounts can only be created from the Django admin panel.")
-            return render(request, 'accounts/register.html')
-
-        full_name = request.POST.get('full_name', '').strip()
+        role = request.POST.get('role', 'STUDENT').upper().strip()
+        name = request.POST.get('full_name', '').strip()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
-        phone = request.POST.get('phone', '').strip()
-        division = request.POST.get('division', 'Dhaka').strip()
-        district = request.POST.get('district', 'Dhaka').strip()
-        area = request.POST.get('area', '').strip()
-        bio = request.POST.get('bio', '').strip()
 
-        if not full_name or not email:
-            messages.error(request, "Full name and email are required.")
-            return render(request, 'accounts/register.html')
+        if role not in ['STUDENT', 'TUTOR']:
+            messages.error(request, 'Please select Student or Tutor.')
 
-        if password != confirm_password:
-            messages.error(request, "Passwords do not match!")
-            return render(request, 'accounts/register.html')
+        elif not name or not email or not password:
+            messages.error(request, 'Please fill in all required fields.')
 
-        if User.objects.filter(username__iexact=email).exists() or User.objects.filter(email__iexact=email).exists():
-            messages.error(request, "An account with this email already exists.")
-            return render(request, 'accounts/register.html')
+        elif password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
 
-        name_parts = full_name.split()
-        first_name = name_parts[0] if name_parts else ''
-        last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ''
+        elif (
+            User.objects.filter(username__iexact=email).exists()
+            or User.objects.filter(email__iexact=email).exists()
+        ):
+            messages.error(request, 'This username or email already exists.')
 
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role=role,
-            phone=phone,
-            division=division,
-            district=district,
-            area=area,
-            bio=bio,
-        )
+        else:
+            names = name.split()
 
-        if role == User.Role.STUDENT:
-            user.institution = request.POST.get('institution', '').strip()
-            user.academic_level = request.POST.get('academic_level', '').strip()
-            budget = request.POST.get('monthly_budget', '').strip()
-            if budget:
-                user.monthly_budget = budget
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=names[0],
+                last_name=' '.join(names[1:]),
+                role=role,
+                phone=request.POST.get('phone', '').strip(),
+                division=request.POST.get('division', 'Dhaka').strip(),
+                district=request.POST.get('district', 'Dhaka').strip(),
+                area=request.POST.get('area', '').strip(),
+                bio=request.POST.get('bio', '').strip(),
+            )
 
-        if 'profile_picture' in request.FILES:
-            user.profile_picture = request.FILES['profile_picture']
+            if role == 'STUDENT':
+                user.institution = request.POST.get('institution', '').strip()
+                user.academic_level = request.POST.get('academic_level', '').strip()
 
-        user.save()
+                budget = request.POST.get('monthly_budget', '').strip()
+                if budget:
+                    user.monthly_budget = budget
 
-        login(request, user)
-        messages.success(request, "Account created successfully! Upload ID documents to complete verification.")
-        return redirect('verify_identity')
+            if 'profile_picture' in request.FILES:
+                user.profile_picture = request.FILES['profile_picture']
+
+            user.save()
+            login(request, user)
+
+            messages.success(request, 'Account created successfully!')
+            return redirect('verify_identity')
 
     return render(request, 'accounts/register.html')
 
 
 @login_required
 def verify_identity_view(request):
-    # Admins do not need to upload their own verification documents.
-    if get_effective_role(request.user) == User.Role.ADMIN:
-        return redirect('admin_dashboard')
+    if request.user.is_superuser:
+        return redirect('/admin/')
 
-    user = request.user
-    user_documents = VerificationDocument.objects.filter(user=user).order_by('-submitted_at')
+    documents = VerificationDocument.objects.filter(
+        user=request.user
+    ).order_by('-submitted_at')
 
     if request.method == 'POST' and 'document_file' in request.FILES:
-        doc_type = request.POST.get('doc_type', VerificationDocument.DocType.STUDENT_ID)
-        doc_file = request.FILES['document_file']
+        if documents.filter(
+            status=VerificationDocument.Status.PENDING
+        ).exists():
+            messages.warning(request, 'A document is already under review.')
+        else:
+            VerificationDocument.objects.create(
+                user=request.user,
+                doc_type=request.POST.get(
+                    'doc_type',
+                    VerificationDocument.DocType.STUDENT_ID
+                ),
+                file=request.FILES['document_file'],
+                status=VerificationDocument.Status.PENDING,
+            )
 
-        # Avoid creating duplicate pending submissions for the same account.
-        if user_documents.filter(status=VerificationDocument.Status.PENDING).exists():
-            messages.warning(request, "You already have a document under review.")
-            return redirect('verify_identity')
+            messages.success(request, 'Document submitted successfully!')
 
-        VerificationDocument.objects.create(
-            user=user,
-            doc_type=doc_type,
-            file=doc_file,
-            status=VerificationDocument.Status.PENDING,
-        )
-        messages.success(request, "Document submitted successfully! An admin will review it soon.")
         return redirect('verify_identity')
 
-    context = {
-        'user_documents': user_documents,
-        'has_pending': user_documents.filter(status=VerificationDocument.Status.PENDING).exists(),
-        'is_approved': user_documents.filter(status=VerificationDocument.Status.APPROVED).exists(),
-    }
-    return render(request, 'accounts/verify_identity.html', context)
+    return render(request, 'accounts/verify_identity.html', {
+        'user_documents': documents,
+        'has_pending': documents.filter(
+            status=VerificationDocument.Status.PENDING
+        ).exists(),
+        'is_approved': documents.filter(
+            status=VerificationDocument.Status.APPROVED
+        ).exists(),
+    })
 
 
+@login_required
 def logout_view(request):
     logout(request)
-    messages.success(request, "You have been logged out successfully.")
+    messages.success(request, 'You have been logged out.')
     return redirect('login')
