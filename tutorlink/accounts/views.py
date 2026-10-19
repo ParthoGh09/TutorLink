@@ -1,3 +1,4 @@
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -72,6 +73,12 @@ def student_dashboard(request):
     return render(request, 'accounts/dashboards/student_dashboard.html', {
         'user': request.user,
         'role_name': 'Student',
+        'location': 'Dhanmondi, Dhaka',  # Placeholder
+        'badges': {
+            'applications': 2,
+            'demos': 1,
+            'messages': 2,
+        },  # Placeholder counts
     })
 
 
