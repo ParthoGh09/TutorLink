@@ -10,7 +10,7 @@ class Subject(models.Model):
 class TutorProfile(models.Model):
     class Mode(models.TextChoices):
         ONLINE = 'ONLINE', 'Online'
-        OFLINE = 'OFLINE', 'Ofline'
+        OFFLINE = 'OFFLINE', 'Offline'
         BOTH = 'BOTH', 'Online + Offline'
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tutor_profile')
