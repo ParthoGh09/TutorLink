@@ -49,7 +49,7 @@ def find_tutors(request):
 
     tutors = tutors.distinct().order_by('-rating', '-review_count')
 
-    return render(request, 'tutors/find_tutors.html', {
+    return render(request, 'tutors/tutors.html', {
         'tutors': tutors,
         'subjects': Subject.objects.all().order_by('name'),
         'class_levels': range(1, 13),
