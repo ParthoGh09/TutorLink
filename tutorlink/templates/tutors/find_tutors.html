@@ -30,6 +30,28 @@
 
         .results { flex: 1; }
         .count { font-weight: 600; margin-bottom: 12px; }
+
+        .tutor { display: flex; align-items: center; gap: 16px; background: #fff;
+                 border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
+                 box-shadow: 0 10px 30px rgba(31, 42, 92, 0.08); }
+        .avatar { width: 56px; height: 56px; border-radius: 50%; background: #E7F8F1;
+                  color: #12A783; display: flex; align-items: center; justify-content: center;
+                  font-weight: 600; font-size: 22px; flex-shrink: 0; }
+        .info { flex: 1; }
+        .name { font-weight: 600; font-size: 16px; }
+        .verified { color: #12A783; font-size: 12px; margin-left: 6px; }
+        .meta { font-size: 12px; color: #6B7390; margin-top: 2px; }
+        .chip { display: inline-block; background: #E4E9FF; border-radius: 8px;
+                padding: 2px 8px; font-size: 11px; margin: 6px 6px 0 0; }
+        .chip.mode { background: #E7F8F1; color: #0F7A55; }
+        .price { text-align: right; }
+        .price b { font-size: 18px; }
+        .price span { display: block; font-size: 11px; color: #6B7390; }
+        .view { display: inline-block; margin-top: 8px; background: #1F2A5C; color: #fff;
+                padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+                text-decoration: none; }
+        .empty { background: #fff; border-radius: 20px; padding: 40px; text-align: center;
+                 color: #6B7390; }
     </style>
 </head>
 <body>
@@ -86,7 +108,31 @@
         </form>
 
         <div class="results">
-            <!-- RESULTS -->
+             <div class="count">{{ tutors|length }} tutors found</div>
+
+            {% for t in tutors %}
+            <div class="tutor">
+                <div class="avatar">{{ t.user.username|slice:":1"|upper }}</div>
+                <div class="info">
+                    <div class="name">{{ t.user.get_full_name|default:t.user.username }}
+                        <span class="verified">✓ Verified</span></div>
+                    <div class="meta">{{ t.department }} · {{ t.university }}</div>
+                    <div>
+                        {% for s in t.subjects.all %}<span class="chip">{{ s.name }}</span>{% endfor %}
+                        <span class="chip">Class {{ t.class_from }}–{{ t.class_to }}</span>
+                        <span class="chip mode">{{ t.get_mode_display }}</span>
+                    </div>
+                    <div class="meta">★ {{ t.rating }} ({{ t.review_count }} reviews) · 📍 {{ t.user.area }} · 🕒 {{ t.available_time }}</div>
+                </div>
+                <div class="price">
+                    <b>৳{{ t.expected_salary|floatformat:0 }}</b>
+                    <span>expected / month</span>
+                    <a href="#" class="view">View Profile</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty">No tutors match your filters.</div>
+            {% endfor %}
         </div>
 
     </div>
