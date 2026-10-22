@@ -119,7 +119,51 @@
 
         <div class="side">
 
-            <!-- DEMO FORM -->
+                        <div class="card">
+                <h2>Request a Demo Class</h2>
+                <div class="meta">Online demo · one per tutor</div>
+
+                {% if existing_demo %}
+                <div class="box" style="margin-top:14px">
+                    You already requested a demo with this tutor.<br>
+                    <b>{{ existing_demo.get_status_display }}</b> ·
+                    {{ existing_demo.date|date:"D, j M" }} · {{ existing_demo.time|time:"g:i A" }}
+                    · {{ existing_demo.get_platform_display }}
+                </div>
+                {% else %}
+                <form method="post">
+                    {% csrf_token %}
+
+                    <span class="lbl">Subject</span>
+                    <select name="subject">
+                        {% for s in tutor.subjects.all %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+                        {% empty %}
+                        <option value="">Any subject</option>
+                        {% endfor %}
+                    </select>
+
+                    <span class="lbl">Date</span>
+                    <input type="date" name="date" min="{{ today|date:'Y-m-d' }}" required>
+
+                    <span class="lbl">Time</span>
+                    <select name="time">
+                        {% for value, label in time_slots %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <span class="lbl">Meeting platform</span>
+                    <div class="plat">
+                        <label><input type="radio" name="platform" value="MEET" checked><span>Google Meet</span></label>
+                        <label><input type="radio" name="platform" value="ZOOM"><span>Zoom</span></label>
+                    </div>
+
+                    <button type="submit" class="btn">Request Online Demo</button>
+                    <div class="note">Free · No offline meeting needed yet</div>
+                </form>
+                {% endif %}
+            </div>
 
             <div class="tip"><b>Online first, offline later</b>
                 After the demo you decide to accept or reject this tutor. Only then can you plan offline tuition.</div>
