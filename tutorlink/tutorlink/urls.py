@@ -29,6 +29,7 @@ urlpatterns = [
     path('', root_redirect, name='root'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('tuition/', include('tuition.urls')),
 ]
 
 if settings.DEBUG:
