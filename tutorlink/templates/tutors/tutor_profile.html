@@ -94,7 +94,26 @@
                 </div>
             </div>
 
-            <!-- MORE CARDS -->
+          <div class="card">
+                <h2>About</h2>
+                <div class="text">{{ tutor.user.bio|default:"This tutor has not added a bio yet."|linebreaksbr }}</div>
+            </div>
+
+            <div class="card">
+                <h2>Subjects &amp; class levels</h2>
+                {% for s in tutor.subjects.all %}<span class="chip">{{ s.name }}</span>{% endfor %}
+                <span class="chip">Class {{ tutor.class_from }}–{{ tutor.class_to }}</span>
+            </div>
+
+            <div class="card">
+                <h2>Availability</h2>
+                <div class="box">🕒 {{ tutor.available_time|default:"Not set yet" }}</div>
+            </div>
+
+            <div class="card">
+                <h2>Reviews ({{ tutor.review_count }})</h2>
+                <div class="box empty">No reviews to show yet. Reviews will appear here after students rate their tutor.</div>
+            </div>
 
         </div>
 
