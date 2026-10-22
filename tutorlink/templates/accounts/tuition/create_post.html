@@ -1,0 +1,148 @@
+{% extends "tuition/base_tuition.html" %}
+{% load static tuition_extras %}
+{% block title %}Create Tuition Post{% endblock %}
+
+{% block content %}
+<div class="back-row">
+  <a class="btn-ghost-coral" href="{% url 'tuition:my_posts' %}"><i data-lucide="arrow-left"></i> Back to My Posts</a>
+</div>
+
+<div class="head-card page-head" style="margin-top:12px">
+  <span class="icon-box ib-coral"><i data-lucide="pen-line"></i></span>
+  <div>
+    <h1>Create Tuition Post</h1>
+    <p>Tell tutors what you need — only your area is shown publicly</p>
+  </div>
+  <div class="head-stats">
+    <div class="stat"><span class="si si-mint"><i data-lucide="book-open"></i></span><span><b>{{ stats.active }}</b><small>Active posts</small></span></div>
+    <div class="stat"><span class="si si-indigo"><i data-lucide="users"></i></span><span><b>{{ stats.applicants }}</b><small>Applicants</small></span></div>
+  </div>
+</div>
+
+<form method="post" id="post-form" novalidate>
+  {% csrf_token %}
+  <div class="grid-main-side" style="grid-template-columns:minmax(0,1fr) 290px">
+
+    <section class="card">
+      <div class="card-title"><h3>Tuition requirement</h3><span class="pill draft">Draft</span></div>
+
+      {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="subject">Subject</label>
+          <select class="select" id="subject" name="subject">
+            {% for s in subjects %}<option value="{{ s }}" {% if form.subject.value == s or not form.subject.value and s == 'Mathematics' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          {{ form.subject.errors }}
+        </div>
+        <div class="field">
+          <label for="class_level">Class level</label>
+          <select class="select" id="class_level" name="class_level">
+            {% for c in class_levels %}<option value="{{ c }}" {% if form.class_level.value == c or not form.class_level.value and c == 'Class 10' %}selected{% endif %}>{{ c }}</option>{% endfor %}
+          </select>
+          {{ form.class_level.errors }}
+        </div>
+
+        <div class="field">
+          <label for="budget">Monthly budget (৳)</label>
+          <input class="input" id="budget" name="budget" placeholder="6,000 – 8,000"
+                 value="{% if request.method == 'POST' %}{{ request.POST.budget }}{% else %}6,000 – 8,000{% endif %}">
+          {{ form.budget.errors }}
+        </div>
+        <div class="field">
+          <label for="post_type">Post type</label>
+          <select class="select" id="post_type" name="post_type">
+            {% for value, label in post_types %}<option value="{{ value }}" {% if form.post_type.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+
+        <div class="field full">
+          <span class="lbl">Preferred location <em>– only the area is public</em></span>
+          <div class="loc-row" id="loc-row"
+               data-division="{{ form.division.value|default:'Dhaka' }}"
+               data-district="{{ form.district.value|default:'Dhaka' }}"
+               data-area="{{ form.area.value|default:'Dhanmondi' }}">
+            <select class="select" name="division" id="division" aria-label="Division"></select>
+            <select class="select" name="district" id="district" aria-label="District"></select>
+            <select class="select" name="area" id="area" aria-label="Area"></select>
+          </div>
+          {{ form.division.errors }}{{ form.area.errors }}
+        </div>
+
+        <div class="field full">
+          <span class="lbl">Preferred days</span>
+          <div class="day-pills">
+            {% for d in days %}
+            <label><input type="checkbox" name="preferred_days" value="{{ d }}" {% if d in selected_days %}checked{% endif %}><span>{{ d }}</span></label>
+            {% endfor %}
+          </div>
+          {{ form.preferred_days.errors }}
+        </div>
+
+        <div class="field">
+          <label for="time_slot">Preferred time</label>
+          <select class="select" id="time_slot" name="time_slot">
+            {% for t in time_slots %}<option value="{{ t }}" {% if form.time_slot.value == t or not form.time_slot.value and t == '5:00 PM – 7:00 PM' %}selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+          {{ form.time_slot.errors }}
+        </div>
+        <div class="field">
+          <span class="lbl">Teaching mode</span>
+          <div class="toggle">
+            <label><input type="radio" name="teaching_mode" value="ONLINE" {% if mode == 'ONLINE' %}checked{% endif %}><i data-lucide="monitor"></i> Online</label>
+            <label><input type="radio" name="teaching_mode" value="OFFLINE" {% if mode == 'OFFLINE' %}checked{% endif %}><i data-lucide="home"></i> Offline</label>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="description">Description</label>
+          <textarea class="textarea" id="description" name="description" rows="4"
+            placeholder="Tell tutors about your goals, weak areas, and study style...">{% if request.method == 'POST' %}{{ request.POST.description }}{% else %}I am in Class 10 (SSC candidate). Need help in Algebra and Geometry, 3 days a week. Looking for a patient tutor who can share weekly progress with my parents.{% endif %}</textarea>
+          {{ form.description.errors }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-outline" type="submit" name="save_draft" value="1">Save Draft</button>
+        <button class="btn btn-coral" type="submit" name="publish" value="1"><i data-lucide="send"></i> Publish Post</button>
+      </div>
+    </section>
+
+    <aside class="stack">
+      <div class="card">
+        <div class="card-title"><h3>Live preview</h3><span class="pill open">Open</span></div>
+        <div class="preview-card">
+          <div class="pv-head">
+            <span class="avatar tone-{{ request.user|avatar_tone }}">{{ request.user|initials }}</span>
+            <div><b id="pv-title">Mathematics · Class 10</b><small>{{ request.user|display_name }} · just now</small></div>
+          </div>
+          <div class="chip-row" id="pv-chips"></div>
+          <p class="pv-desc" id="pv-desc"></p>
+          <div class="pv-loc"><i data-lucide="map-pin"></i><span id="pv-loc"></span></div>
+        </div>
+      </div>
+
+      <div class="note-yellow">
+        <i data-lucide="sparkles"></i>
+        <div><b>Smart Match will run automatically</b><span>Once published, tutors are scored and the best matches get notified.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Tips for a great post</h3>
+        <ul class="tips">
+          <li><i data-lucide="check"></i> Mention weak topics &amp; exam dates</li>
+          <li><i data-lucide="check"></i> Give a realistic budget range</li>
+          <li><i data-lucide="check"></i> Choose online for a safer first demo</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</form>
+
+{{ locations|json_script:"locations-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'tuition/js/create_post.js' %}"></script>
+{% endblock %}

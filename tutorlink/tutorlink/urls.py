@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
 path('tutors/', include('tutors.urls')),
+    path('tuition/', include('tuition.urls')),
 ]
 
 if settings.DEBUG:

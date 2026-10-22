@@ -1,0 +1,134 @@
+{% extends "tuition/base_tuition.html" %}
+{% load static tuition_extras %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="back-row">
+  <a class="btn-ghost-coral" href="javascript:history.back()"><i data-lucide="arrow-left"></i> Back</a>
+  <span class="crumbs">
+    <a href="{{ home_url }}">Home</a> &gt;
+    <a href="{% if role == 'TUTOR' %}{% url 'tuition:find_tuition' %}{% else %}{% url 'tuition:my_posts' %}{% endif %}">Tuition Posts</a> &gt;
+    <b>{{ post.title }}</b>
+  </span>
+</div>
+
+<div class="grid-main-side">
+
+  {# ================= left: post + discussion ================= #}
+  <div class="stack">
+    <section class="card">
+      <div class="post-head">
+        <span class="avatar tone-{{ post.student|avatar_tone }}">{{ post.student|initials }}</span>
+        <div>
+          <h1>{{ post.title }}</h1>
+          <div class="by">Posted by {{ post.student|display_name }} · {{ post.created_at|ago }} · {{ post.location_display }}</div>
+          <div class="chip-row" style="margin:0">
+            <span class="chip"><i data-lucide="banknote"></i> {{ post.budget_display }} / month</span>
+            <span class="chip"><i data-lucide="calendar"></i> {{ post.days_display }}</span>
+            <span class="chip"><i data-lucide="clock"></i> {{ post.time_display }}</span>
+            {% if post.is_online %}<span class="chip green"><i data-lucide="monitor"></i> Online</span>
+            {% else %}<span class="chip red"><i data-lucide="home"></i> Offline</span>{% endif %}
+          </div>
+        </div>
+        <span class="pill {{ post.status|lower }}">{{ post.get_status_display }}</span>
+      </div>
+      <hr class="hr">
+      <div class="desc">
+        <b>Description</b>
+        <p>{{ post.description|linebreaksbr }}</p>
+      </div>
+    </section>
+
+    <section class="card thread" id="discussion">
+      <h3>Discussion · {{ comment_count }} comment{{ comment_count|pluralize }}</h3>
+
+      {% for c in comments %}
+        {% include "tuition/_comment.html" with c=c post=post %}
+        {% if c.replies.all %}
+        <div class="replies">
+          {% for r in c.replies.all %}{% include "tuition/_comment.html" with c=r post=post %}{% endfor %}
+        </div>
+        {% endif %}
+      {% empty %}
+        <p class="muted small" style="margin:10px 0 0">No comments yet. Ask the student a question.</p>
+      {% endfor %}
+
+      <form class="composer" method="post" action="{% url 'tuition:add_comment' post.pk %}">
+        {% csrf_token %}
+        <span class="avatar sm tone-{{ request.user|avatar_tone }}">{{ request.user|initials }}</span>
+        <div class="box">
+          <input class="input" name="body" maxlength="1000" placeholder="Write a comment..." required>
+          <button type="submit" aria-label="Send"><i data-lucide="send"></i></button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  {# ================= right: apply + about ================= #}
+  <aside class="stack">
+    {% if role == 'TUTOR' %}
+    <section class="card" id="apply">
+      <h3>Apply for this tuition</h3>
+      <div class="apply-ring">
+        <div class="ring lg {{ match.total|match_tone }}" style="--p:{{ match.total }}"><b>{{ match.total }}%</b></div>
+        <div><b>{{ match.total }}% match</b><small>Subject, level &amp; budget fit</small></div>
+      </div>
+
+      {% if application %}
+        <div class="applied-box">
+          <b><i data-lucide="check-circle-2" style="vertical-align:-3px"></i> You applied {{ application.applied_at|ago }}</b>
+          Status: <span class="st st-{{ application.status }}">{{ application.get_status_display }}</span>
+        </div>
+      {% elif not verified %}
+        <div class="note-red"><i data-lucide="shield-alert"></i><div><b>Verification needed</b><span>Get your identity approved to apply.</span></div></div>
+      {% elif can_apply %}
+        <form method="post" action="{% url 'tuition:apply' post.pk %}">
+          {% csrf_token %}
+          <label class="lbl" for="message">Message to student</label>
+          <textarea class="textarea" id="message" name="message" rows="3" maxlength="600"
+                    placeholder="Introduce yourself and your teaching approach..."></textarea>
+          <button class="btn btn-coral btn-block" type="submit" style="margin-top:10px"><i data-lucide="send"></i> Apply Now</button>
+        </form>
+        <div class="center-note">Next step: request one online demo class</div>
+      {% else %}
+        <div class="note-yellow"><i data-lucide="lock"></i><div><b>Applications closed</b><span>This post is {{ post.get_status_display|lower }}.</span></div></div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="card about-student">
+      <h3 style="margin-bottom:8px">About the student</h3>
+      <b>{{ post.student|display_name }} <i data-lucide="badge-check" class="v-icon"></i></b>
+      <p>{{ student_level }}{% if student_school %} · {{ student_school }}{% endif %}</p>
+      {% if not is_owner %}
+      <div class="btn-pair">
+        <a class="btn btn-outline" href="#"><i data-lucide="message-circle"></i> Message</a>
+        <a class="btn btn-outline btn-report" href="#"><i data-lucide="flag"></i> Report</a>
+      </div>
+      {% endif %}
+    </section>
+
+    <div class="note-green">
+      <i data-lucide="shield-check"></i>
+      <div><b>Exact address hidden</b><span>Only area is shown until both sides accept after the demo.</span></div>
+    </div>
+
+    {% if is_owner %}
+    <a class="btn btn-outline btn-block" href="{% url 'tuition:my_posts' %}"><i data-lucide="list"></i> Manage my posts</a>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Reply / edit boxes open inline.
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-toggle]");
+    if (!t) return;
+    e.preventDefault();
+    var box = document.getElementById(t.dataset.toggle);
+    if (box) { box.classList.toggle("show"); var i = box.querySelector("input,textarea"); if (i) i.focus(); }
+  });
+</script>
+{% endblock %}

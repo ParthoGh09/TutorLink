@@ -1,0 +1,50 @@
+{% load tuition_extras %}
+<div class="c" id="comment-{{ c.pk }}">
+  <div class="c-row">
+    <span class="avatar sm tone-{{ c.author|avatar_tone }}">{{ c.author|initials }}</span>
+    <div class="body">
+      <div class="bubble {% if c.author_id == post.student_id %}owner{% endif %}">
+        <div class="c-head">
+          <b>{{ c.author|display_name }}</b>
+          {% if c.author_id == post.student_id %}<span class="tagrole owner">Post owner</span>
+          {% elif c.author|is_role:'TUTOR' %}<span class="tagrole tutor">Tutor</span>
+          {% else %}<span class="tagrole">{{ c.author|role_label }}</span>{% endif %}
+          <span class="time">{{ c.created_at|ago }}{% if c.edited %} · edited{% endif %}</span>
+        </div>
+        <p class="c-text">{{ c.body|linebreaksbr }}</p>
+      </div>
+
+      <div class="c-actions">
+        <a href="#" class="first" data-toggle="reply-{{ c.pk }}">Reply</a>
+        {% if c.author_id == request.user.pk %}
+          · <a href="#" data-toggle="edit-{{ c.pk }}">Edit</a>
+        {% endif %}
+        {% if c.author_id == request.user.pk or request.user|is_role:'ADMIN' %}
+          · <form method="post" action="{% url 'tuition:delete_comment' c.pk %}"
+                  onsubmit="return confirm('Delete this comment?');">
+              {% csrf_token %}<button type="submit">Delete</button>
+            </form>
+        {% endif %}
+      </div>
+
+      <form class="inline-form" id="reply-{{ c.pk }}" method="post" action="{% url 'tuition:add_comment' post.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="parent" value="{{ c.pk }}">
+        <div class="row">
+          <input class="input" name="body" maxlength="1000" placeholder="Reply to {{ c.author|display_name }}..." required>
+          <button class="btn btn-navy btn-sm" type="submit">Reply</button>
+        </div>
+      </form>
+
+      {% if c.author_id == request.user.pk %}
+      <form class="inline-form" id="edit-{{ c.pk }}" method="post" action="{% url 'tuition:edit_comment' c.pk %}">
+        {% csrf_token %}
+        <div class="row">
+          <input class="input" name="body" maxlength="1000" value="{{ c.body }}" required>
+          <button class="btn btn-navy btn-sm" type="submit">Save</button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>

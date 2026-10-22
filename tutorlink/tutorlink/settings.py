@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     # Custom Apps
     'accounts',
     'tutors',
+    'tuition',
 ]
 
 MIDDLEWARE = [
