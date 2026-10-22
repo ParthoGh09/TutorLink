@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:s.id>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,7 +127,7 @@
                 <div class="price">
                     <b>৳{{ t.expected_salary|floatformat:0 }}</b>
                     <span>expected / month</span>
-                    <a href="#" class="view">View Profile</a>
+                    <a href="{% url 'tutor_profile' t.pk %}" class="view">View Profile</a>
                 </div>
             </div>
             {% empty %}
