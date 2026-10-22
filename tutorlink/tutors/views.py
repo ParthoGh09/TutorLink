@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.models import User
 from .models import Subject, TutorProfile
@@ -55,3 +55,14 @@ def find_tutors(request):
         'class_levels': range(1, 13),
         'filters': request.GET,
     })
+
+@login_required
+def tutor_profile(request, pk):
+    if request.user.role != User.Role.STUDENT:
+        return redirect('role_dashboard')
+
+    tutor = get_object_or_404(
+        TutorProfile.objects.select_related('user').prefetch_related('subjects'),
+        pk=pk, user__is_verified=True,
+    )
+    return render(request, 'tutors/tutor_profile.html', {'tutor': tutor})
