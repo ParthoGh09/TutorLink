@@ -1,0 +1,47 @@
+{% extends "tuition/base_tuition.html" %}
+{% load tuition_extras %}
+{% block title %}My Tuition Posts{% endblock %}
+
+{% block content %}
+<div class="back-row">
+  <a class="btn-ghost-coral" href="{{ home_url }}"><i data-lucide="arrow-left"></i> Back to Home</a>
+</div>
+
+<div class="head-card page-head" style="margin-top:12px">
+  <span class="icon-box ib-coral"><i data-lucide="book-open"></i></span>
+  <div><h1>My Tuition Posts</h1><p>Publish, pause or close the posts you've created</p></div>
+  <div class="head-stats">
+    <a class="btn btn-coral" href="{% url 'tuition:create_post' %}"><i data-lucide="plus"></i> Post a Tuition Need</a>
+  </div>
+</div>
+
+<section class="card" style="margin-top:12px">
+  {% for p in posts %}
+  <div class="row-post">
+    <div class="grow">
+      <h4><a href="{{ p.get_absolute_url }}">{{ p.title }}</a> <span class="pill {{ p.status|lower }}">{{ p.get_status_display }}</span></h4>
+      <div class="meta">
+        <span><i data-lucide="banknote"></i> {{ p.budget_display }}/mo</span>
+        <span><i data-lucide="map-pin"></i> {{ p.location_display }}</span>
+        <span><i data-lucide="users"></i> {{ p.applicant_count }} applicant{{ p.applicant_count|pluralize }}</span>
+        <span><i data-lucide="calendar"></i> {{ p.created_at|ago }}</span>
+      </div>
+    </div>
+    <div class="row-actions">
+      <form method="post" action="{% url 'tuition:change_status' p.pk %}">
+        {% csrf_token %}
+        {% if p.status == 'DRAFT' %}<button class="btn btn-coral btn-sm" name="action" value="publish">Publish</button>
+        {% elif p.status == 'OPEN' %}<button class="btn btn-outline btn-sm" name="action" value="pause">Pause</button>
+          <button class="btn btn-outline btn-sm" name="action" value="close">Close</button>
+        {% elif p.status == 'PAUSED' %}<button class="btn btn-navy btn-sm" name="action" value="reopen">Reopen</button>
+          <button class="btn btn-outline btn-sm" name="action" value="close">Close</button>
+        {% else %}<button class="btn btn-outline btn-sm" name="action" value="reopen">Reopen</button>{% endif %}
+      </form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty"><i data-lucide="file-plus"></i><p>You haven't posted yet.<br>
+    <a class="btn btn-coral" style="margin-top:10px" href="{% url 'tuition:create_post' %}">Create your first post</a></p></div>
+  {% endfor %}
+</section>
+{% endblock %}

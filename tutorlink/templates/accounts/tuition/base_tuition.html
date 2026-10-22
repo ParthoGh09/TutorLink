@@ -1,0 +1,71 @@
+{% load static tuition_extras %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TutorLink{% endblock %} · TutorLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'tuition/css/tuition.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="tl">
+<div class="shell">
+  <div class="window">
+
+    <header class="topbar">
+      <a class="logo" href="{{ home_url }}">
+        <span class="logo-mark"><i data-lucide="graduation-cap"></i></span>
+        <span>
+          <span class="logo-text">Tutor<b>Link</b></span>
+          <span class="logo-tag">Connect | Learn | Earn | Safety</span>
+        </span>
+      </a>
+
+      <div class="loc-pill">
+        <i data-lucide="map-pin"></i>
+        <span><small>Current Location</small><b>{% user_area request.user %}</b></span>
+        <i data-lucide="chevron-down" style="margin-left:auto"></i>
+      </div>
+      <a class="btn btn-outline" href="#"><i data-lucide="plus"></i> Add Location</a>
+
+      <form class="search" action="{% if role == 'TUTOR' %}{% url 'tuition:find_tuition' %}{% else %}{% url 'tuition:my_posts' %}{% endif %}" method="get">
+        <input type="text" name="q" value="{{ f.q|default:'' }}"
+               placeholder="{% if role == 'TUTOR' %}Search tuition posts, subjects...{% else %}Search tutors, posts, subjects...{% endif %}">
+        <button type="submit" aria-label="Search"><i data-lucide="search"></i></button>
+      </form>
+
+      <div class="top-actions">
+        {# TODO: point these at the Notifications (17) and Messages (14) screens once merged #}
+        <a class="icon-btn" href="#" aria-label="Notifications"><i data-lucide="bell"></i></a>
+        <a class="icon-btn" href="#" aria-label="Messages"><i data-lucide="message-square"></i></a>
+        <div class="user-chip">
+          <span class="avatar tone-{{ request.user|avatar_tone }}">{{ request.user|initials }}</span>
+          <span><b>{{ request.user|display_name }}</b><small>{{ request.user|role_label }}</small></span>
+          <i data-lucide="chevron-down" class="muted"></i>
+        </div>
+      </div>
+    </header>
+
+    {% if messages %}
+    <div class="flash">
+      {% for m in messages %}<div class="{{ m.tags }}">{{ m }}</div>{% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="content">
+      {% block content %}{% endblock %}
+      <div class="trust-banner">
+        <i data-lucide="shield-check"></i>
+        All tutors and students on TutorLink are identity-verified. Connect safely online first, meet offline later.
+      </div>
+    </main>
+
+  </div>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

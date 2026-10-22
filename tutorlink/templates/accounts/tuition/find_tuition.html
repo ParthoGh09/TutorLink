@@ -1,0 +1,211 @@
+{% extends "tuition/base_tuition.html" %}
+{% load static tuition_extras %}
+{% block title %}Find Tuition{% endblock %}
+
+{% block content %}
+<div class="back-row">
+  <a class="btn-ghost-coral" href="{{ home_url }}"><i data-lucide="arrow-left"></i> Back to Home</a>
+</div>
+
+<div class="head-card page-head" style="margin-top:12px">
+  <span class="icon-box ib-mint"><i data-lucide="book-open"></i></span>
+  <div>
+    <h1>Find Tuition</h1>
+    <p>Browse genuine, verified tuition opportunities near you</p>
+  </div>
+  <div class="head-stats">
+    <div class="stat"><span class="si si-mint"><i data-lucide="book-open"></i></span><span><b>{{ open_total }}</b><small>Open posts</small></span></div>
+    <div class="stat"><span class="si si-sun"><i data-lucide="users"></i></span><span><b>{{ matched_for_you }}</b><small>Matched for you</small></span></div>
+    <div class="stat"><span class="si si-indigo"><i data-lucide="shield-check"></i></span><span><b>100%</b><small>Verified students</small></span></div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <a href="?tab=posts" class="{% if tab == 'posts' %}active{% endif %}"><i data-lucide="book-open"></i> Tuition Posts</a>
+  <a href="?tab=recommended" class="{% if tab == 'recommended' %}active{% endif %}"><i data-lucide="sparkles"></i> Recommended</a>
+  <a href="?tab=applications" class="{% if tab == 'applications' %}active{% endif %}"><i data-lucide="users"></i> My Applications</a>
+  <a href="?tab=saved" class="{% if tab == 'saved' %}active{% endif %}"><i data-lucide="bookmark"></i> Saved Posts</a>
+</nav>
+
+<div class="grid-filter">
+
+  {# ---------------- filters ---------------- #}
+  <form class="card filter" method="get" id="filter-form">
+    <input type="hidden" name="f" value="1">
+    <input type="hidden" name="tab" value="{{ tab }}">
+    {% if f.q %}<input type="hidden" name="q" value="{{ f.q }}">{% endif %}
+    <h3>Filter Posts <a href="?tab={{ tab }}">Reset ↻</a></h3>
+
+    <div class="field">
+      <span class="lbl">Subject</span>
+      <select class="select" name="subject">
+        <option value="">All Subjects</option>
+        {% for s in subjects %}<option value="{{ s }}" {% if f.subject == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <span class="lbl">Class level</span>
+      <select class="select" name="class_level">
+        <option value="">All Levels</option>
+        {% for c in class_levels %}<option value="{{ c }}" {% if f.class_level == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field" id="filter-loc"
+         data-division="{{ f.division }}" data-district="{{ f.district }}" data-area="{{ f.area }}">
+      <span class="lbl">Location</span>
+      <select class="select" name="division" id="f-division" style="margin-bottom:6px" aria-label="Division"></select>
+      <select class="select" name="district" id="f-district" style="margin-bottom:6px" aria-label="District"></select>
+      <select class="select" name="area" id="f-area" aria-label="Area"></select>
+    </div>
+
+    <div class="field">
+      <span class="lbl">Budget range</span>
+      <div class="range" id="budget-range" data-floor="{{ budget_floor }}" data-ceil="{{ budget_ceil }}">
+        <div class="track"></div><div class="fill"></div>
+        <input type="range" name="min_budget" min="{{ budget_floor }}" max="{{ budget_ceil }}" step="500" value="{{ f.min_budget }}" aria-label="Minimum budget">
+        <input type="range" name="max_budget" min="{{ budget_floor }}" max="{{ budget_ceil }}" step="500" value="{{ f.max_budget }}" aria-label="Maximum budget">
+      </div>
+      <div class="range-labels"><span id="min-label">৳{{ budget_floor }}</span><span id="max-label">৳{{ budget_ceil }}+</span></div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">Teaching mode</span>
+      <label class="check"><input type="checkbox" name="mode" value="ONLINE" {% if 'ONLINE' in f.modes %}checked{% endif %}> Online</label>
+      <label class="check"><input type="checkbox" name="mode" value="OFFLINE" {% if 'OFFLINE' in f.modes %}checked{% endif %}> Offline</label>
+    </div>
+    <div class="field">
+      <span class="lbl">Status</span>
+      <label class="check"><input type="checkbox" name="open_only" value="1" {% if f.open_only %}checked{% endif %}> Open only</label>
+      <label class="check"><input type="checkbox" name="include_paused" value="1" {% if f.include_paused %}checked{% endif %}> Include paused</label>
+    </div>
+    <button class="btn btn-navy btn-block" type="submit"><i data-lucide="sliders-horizontal"></i> Apply Filters</button>
+  </form>
+
+  {# ---------------- list ---------------- #}
+  <section>
+    {% if tab == 'applications' %}
+      <div class="list-head"><b>{{ my_apps|length }} Application{{ my_apps|length|pluralize }}</b></div>
+      {% for app in my_apps %}
+      <div class="post-card" style="grid-template-columns:52px minmax(0,1fr) 70px 96px">
+        <span class="avatar tone-{{ app.post.student|avatar_tone }}">{{ app.post.student|initials }}</span>
+        <div>
+          <h4><a href="{{ app.post.get_absolute_url }}">{{ app.post.title }}</a></h4>
+          <div class="by">Posted by {{ app.post.student|display_name }} · applied {{ app.applied_at|ago }}</div>
+          <div class="chip-row">
+            <span class="chip">{{ app.post.budget_display }}/mo</span>
+            <span class="st st-{{ app.status }}">{{ app.get_status_display }}</span>
+          </div>
+        </div>
+        <div class="ring-wrap">
+          <div class="ring {{ app.match_score|match_tone }}" style="--p:{{ app.match_score }}"><b>{{ app.match_score }}%</b></div>
+          <small>your match</small>
+        </div>
+        <div class="card-actions"><a class="btn btn-soft" href="{{ app.post.get_absolute_url }}"><i data-lucide="eye"></i> Details</a></div>
+      </div>
+      {% empty %}
+      <div class="card empty"><i data-lucide="users"></i><p>You haven't applied to any tuition yet.</p></div>
+      {% endfor %}
+
+    {% else %}
+      <div class="list-head">
+        <b>{{ total }} Tuition Post{{ total|pluralize }} Found</b>
+        <form method="get" class="sort-form">
+          {% for k, vals in request.GET.lists %}{% if k != 'sort' and k != 'limit' %}{% for v in vals %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}{% endif %}{% endfor %}
+          <select class="select" name="sort" onchange="this.form.submit()" aria-label="Sort">
+            <option value="match" {% if f.sort == 'match' %}selected{% endif %}>Sort by: Best Match</option>
+            <option value="newest" {% if f.sort == 'newest' %}selected{% endif %}>Sort by: Newest</option>
+            <option value="budget" {% if f.sort == 'budget' %}selected{% endif %}>Sort by: Highest budget</option>
+          </select>
+        </form>
+      </div>
+
+      {% for post, score in cards %}
+      <article class="post-card">
+        <span class="avatar tone-{{ post.student|avatar_tone }}">{{ post.student|initials }}</span>
+        <div>
+          <h4>
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            <span class="pill {{ post.status|lower }}">{{ post.get_status_display }}</span>
+          </h4>
+          <div class="by">Posted by {{ post.student|display_name }} · {{ post.created_at|ago }}</div>
+          <div class="chip-row" style="margin:0">
+            <span class="chip">{{ post.budget_display }}/mo</span>
+            <span class="chip">{{ post.days_display }}</span>
+            {% if post.is_online %}<span class="chip green"><i data-lucide="monitor"></i> Online</span>
+            {% else %}<span class="chip red"><i data-lucide="home"></i> Offline</span>{% endif %}
+          </div>
+          <div class="meta">
+            <span><i data-lucide="map-pin"></i> {{ post.location_display }}</span>
+            <span><i data-lucide="clock"></i> {{ post.time_display }}</span>
+            <span><i data-lucide="message-circle"></i> {{ post.comment_count }} comment{{ post.comment_count|pluralize }}</span>
+          </div>
+        </div>
+        <div class="ring-wrap">
+          <div class="ring {{ score|match_tone }}" style="--p:{{ score }}"><b>{{ score }}%</b></div>
+          <small>your match</small>
+        </div>
+        <div class="card-actions">
+          {% if post.pk in applied_ids %}
+            <span class="btn btn-soft disabled"><i data-lucide="check"></i> Applied</span>
+          {% else %}
+            <a class="btn btn-navy" href="{{ post.get_absolute_url }}#apply">Apply</a>
+          {% endif %}
+          <a class="btn btn-soft" href="{{ post.get_absolute_url }}"><i data-lucide="eye"></i> Details</a>
+        </div>
+        <form class="save-form" method="post" action="{% url 'tuition:toggle_save' post.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="save-btn {% if post.pk in saved_ids %}on{% endif %}" type="submit"
+                  aria-label="{% if post.pk in saved_ids %}Unsave{% else %}Save{% endif %} post"><i data-lucide="bookmark"></i></button>
+        </form>
+      </article>
+      {% empty %}
+      <div class="card empty">
+        <i data-lucide="search-x"></i>
+        <p><b>No tuition posts match.</b><br>Try loosening the filters.</p>
+      </div>
+      {% endfor %}
+
+      {% if more_url %}<a class="more-btn" href="{{ more_url }}">Load More <i data-lucide="chevron-down"></i></a>{% endif %}
+    {% endif %}
+  </section>
+
+  {# ---------------- sidebar ---------------- #}
+  <aside class="stack">
+    <div class="card">
+      <div class="card-title"><h3>Your tutor profile</h3><span class="badge-verified">Verified</span></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="avatar tone-{{ request.user|avatar_tone }}">{{ request.user|initials }}</span>
+        <div>
+          <b>{{ request.user|display_name }}</b>
+          <div class="muted xs">
+            {% if tutor_institution %}{{ tutor_institution }}{% endif %}{% if tutor_department %} · {{ tutor_department }}{% endif %}{% if tutor_rating %} · {{ tutor_rating }} ★{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="progress"><i style="width:{{ completeness }}%"></i></div>
+      <div class="muted xs" style="margin-top:4px">Profile {{ completeness }}% complete</div>
+    </div>
+
+    <div class="note-yellow">
+      <i data-lucide="sparkles"></i>
+      <div><b>Posts matched for you</b><span>Sorted by match % against your subjects, area, salary and availability.</span></div>
+    </div>
+
+    <div class="card">
+      <h3>My applications</h3>
+      {% for app in side_apps %}
+        <div class="app-row"><span>{{ app.post.subject }} · {{ app.post.class_level }}</span><span class="st st-{{ app.status }}">{{ app.get_status_display }}</span></div>
+      {% empty %}
+        <p class="muted small" style="margin:8px 0 0">Nothing yet. Apply to a post to see it here.</p>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+
+{{ locations|json_script:"locations-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'tuition/js/find_tuition.js' %}"></script>
+{% endblock %}
