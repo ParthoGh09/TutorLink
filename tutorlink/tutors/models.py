@@ -35,6 +35,35 @@ class TutorProfile(models.Model):
     def __str__(self):
         return f"Tutor profile: {self.user.username}"
 
+class DemoClass(models.Model):
+    class Platform(models.TextChoices):
+        MEET = 'MEET', 'Google Meet'
+        ZOOM = 'ZOOM', 'Zoom'
 
+    class Status(models.TextChoices):
+        REQUESTED = 'REQUESTED', 'Requested'
+        SCHEDULED = 'SCHEDULED', 'Scheduled'
+        COMPLETED = 'COMPLETED', 'Completed'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='demo_requests'
+    )
+    tutor = models.ForeignKey(TutorProfile, on_delete=models.CASCADE, related_name='demo_classes')
+    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
+    date = models.DateField()
+    time = models.TimeField()
+    platform = models.CharField(max_length=10, choices=Platform.choices, default=Platform.MEET)
+    meeting_link = models.URLField(blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.REQUESTED)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'tutor'], name='one_demo_per_student_tutor'),
+        ]
+
+    def __str__(self):
+        return f"Demo: {self.student.username} with {self.tutor.user.username} ({self.status})"
 
 
