@@ -1,98 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Home | TutorLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; padding: 40px 16px; background: #F1F4F9; color: #1F2A5C;
-               font-family: 'Poppins', sans-serif; }
-        .card { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 28px;
-                padding: 40px; box-shadow: 0 20px 40px rgba(31, 42, 92, 0.12); }
-
-        .top { position: relative; padding-bottom: 16px; margin-bottom: 24px;
-               border-bottom: 1px solid #E5E9F2; }
-        h1 { font-family: 'Lora', serif; font-size: 30px; margin: 0; }
-        .sub { font-size: 13px; color: #6B7390; margin-top: 4px; }
-        .logout { position: absolute; right: 0; top: 8px; font-size: 13px;
-                  color: #FF6B5B; text-decoration: none; }
-
-        .notice { background: #DDFBE9; color: #0F7A55; border-radius: 12px;
-                  padding: 14px 16px; font-size: 14px; margin-bottom: 24px; }
-
-        .label { font-size: 12px; font-weight: 600; text-transform: uppercase;
-                 margin: 0 0 12px; }
-        .btn { display: inline-block; background: #1F2A5C; color: #fff; font-size: 14px;
-               font-weight: 600; padding: 14px 22px; border-radius: 12px;
-               text-decoration: none; }
-        .section { margin-bottom: 28px; }
-
-        .grid { margin: 0 -8px 28px; overflow: hidden; }
-        .feature { float: left; width: 33.333%; box-sizing: border-box; padding: 8px; }
-        .feature a { display: block; border-radius: 16px; padding: 26px 12px;
-                     text-align: center; text-decoration: none; color: #1F2A5C; }
-        .feature a:hover { box-shadow: 0 6px 16px rgba(31, 42, 92, 0.15); }
-        .icon { font-size: 34px; margin-bottom: 6px; }
-        .feature h3 { font-size: 16px; margin: 0 0 4px; }
-        .feature p { font-size: 12px; color: #6B7390; margin: 0; }
-        .mint { background: #E7F8F1; }
-        .sun { background: #FFF6CC; }
-        .rose { background: #FDE4E2; }
-        .blue { background: #E4E9FF; }
-        .purple { background: #EDE5F7; }
-        .grey { background: #EEF1F8; }
-
-        .upcoming { position: relative; border: 2px dashed #CBD2E3; background: #F8FAFD;
-                    border-radius: 16px; padding: 16px 20px; }
-        .upcoming b { font-size: 14px; }
-        .upcoming span { display: block; font-size: 12px; color: #6B7390; margin-top: 2px; }
-        .join { position: absolute; right: 20px; top: 16px; background: #1F2A5C; color: #fff;
-                font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 10px;
-                text-decoration: none; }
-
-        .safe { text-align: center; font-size: 12px; color: #6B7390; margin-top: 24px; }
-    </style>
-</head>
-<body>
-    <div class="card">
-
-        <div class="top">
-            <h1>Student Home</h1>
-            <div class="sub">Welcome, {{ user.get_full_name|default:user.username }} · 📍 {{ location }}</div>
-            <a href="{% url 'logout' %}" class="logout">Log Out</a>
-        </div>
-
-        <div class="notice">✓ Verified student</div>
-
-        <div class="section">
-            <a href="#" class="btn">+ Post a Tuition Need</a>
-        </div>
-
-        <p class="label">Main Features</p>
-        <div class="grid">
-           <div class="feature"><a href="{% url 'find_tutors' %}" class="mint">
-                <div class="icon">🎓</div><h3>Find Tutors</h3><p>Browse verified tutors near you</p></a></div>
-            <div class="feature"><a href="#" class="sun">
-                <div class="icon">✨</div><h3>Smart Match</h3><p>Best tutors for your needs</p></a></div>
-            <div class="feature"><a href="#" class="rose">
-                <div class="icon">📖</div><h3>Tuition Posts</h3><p>Browse or manage posts</p></a></div>
-            <div class="feature"><a href="#" class="blue">
-                <div class="icon">🎥</div><h3>Demo Classes</h3><p>Schedule your online demo</p></a></div>
-            <div class="feature"><a href="#" class="purple">
-                <div class="icon">💬</div><h3>Messages</h3><p>Chat with tutors safely</p></a></div>
-            <div class="feature"><a href="#" class="grey">
-                <div class="icon">🗺️</div><h3>Live Location</h3><p>Share location for offline meets</p></a></div>
-        </div>
-
-        <p class="label">Upcoming Demo</p>
-        <div class="upcoming">
-            <b>Math with Tanvir Hasan</b>
-            <span>Tomorrow, 5:00 PM · Google Meet</span>
-            <a href="#" class="join">Join Demo</a>
-        </div>
-
-        <div class="safe">All tutors and students on TutorLink are identity-verified. Connect safely online first, meet offline later.</div>
-    </div>
-</body>
-</html>
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block heading %}Student Home{% endblock %}
+{% block nav %}
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Post a Tuition Need</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tutors</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Applications</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
+<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
+{% endblock %}
+{% block content %}
+<div class="bg-navy text-white rounded-3xl p-7 md:p-9 mb-6">
+    <p class="text-sm text-slate-300">Welcome back, {{ user.first_name|default:user.username }} 👋</p>
+    <h2 class="text-3xl font-bold font-serif mt-1">Find a tutor who fits your needs.</h2>
+    <p class="text-sm text-slate-300 mt-3 max-w-2xl">Search verified tutors, publish a tuition need and use the online-first demo flow described in the TutorLink design.</p>
+    <div class="mt-6 flex flex-wrap gap-3"><a href="#" class="px-4 py-2.5 rounded-xl bg-sunshine text-navy text-sm font-bold">Find Tutors</a><a href="#" class="px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-semibold">Post a Tuition Need</a></div>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+{% for item in "Find Tutors,Post Tuition Need,Applications,Demo Classes"|make_list %}{% endfor %}
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">🔎</div><h3 class="font-bold text-navy mt-3">Find Tutors</h3><p class="text-xs text-slate-500 mt-1">Filter by subject, level, budget and area.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📝</div><h3 class="font-bold text-navy mt-3">Tuition Post</h3><p class="text-xs text-slate-500 mt-1">Publish your requirement and trigger matching.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">📋</div><h3 class="font-bold text-navy mt-3">Applications</h3><p class="text-xs text-slate-500 mt-1">Track tutor applications and decisions.</p></div>
+<div class="bg-white rounded-2xl border p-5"><div class="text-2xl">💻</div><h3 class="font-bold text-navy mt-3">Demo Classes</h3><p class="text-xs text-slate-500 mt-1">Manage your mandatory online demo.</p></div>
+</div>
+{% endblock %}
