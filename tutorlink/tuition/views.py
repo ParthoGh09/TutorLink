@@ -6,12 +6,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from accounts.views import get_effective_role, role_required
-
 from .constants import CLASS_LEVELS, DAYS, LOCATIONS, SUBJECTS, TIME_SLOTS
 from .forms import ApplicationForm, CommentForm, TuitionPostForm
 from .matching import calculate_match, find_matching_tutors, get_attr
 from .models import Application, Comment, SavedPost, TuitionPost
+from .permissions import get_effective_role, role_required
 
 PAGE_SIZE = 4  # the design shows four cards, then "Load More"
 BUDGET_FLOOR, BUDGET_CEIL = 3000, 10000
@@ -27,7 +26,7 @@ def user_role(user):
 
 def is_verified(user):
     """Admin-approved identity (User.is_verified, set from the admin panel)."""
-    return bool(user.is_verified)
+    return bool(getattr(user, "is_verified", True))
 
 
 def ctx(request, **extra):
