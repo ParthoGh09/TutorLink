@@ -1,0 +1,44 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TutorLink{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a class="logo" href="{% url 'home' %}">
+      <span class="logo-mark">🎓</span>
+      <span><span class="logo-text">Tutor<em>Link</em></span><small>Connect | Learn | Earn | Safety</small></span>
+    </a>
+    <div class="loc-box"><small>Current Location</small><strong>📍 Dhanmondi, Dhaka</strong></div>
+    <button class="btn btn-light" type="button">+ Add Location</button>
+    <form class="search" onsubmit="return false;">
+      <input type="text" placeholder="Search tutors, posts, subjects...">
+      <button type="submit" aria-label="Search">🔍</button>
+    </form>
+    <div class="top-icons"><span class="ico">🔔<b>3</b></span><span class="ico">💬<b>2</b></span></div>
+    <div class="user">
+      <span class="avatar sm" style="background:#FFDCD6">{{ student.initials }}</span>
+      <span><strong>{{ student.name }}</strong><small>{{ student.role }}</small></span>
+    </div>
+  </header>
+
+  <main class="page">
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for m in messages %}<div class="flash flash-{{ m.tags }}">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+    <div class="safe-strip">🛡 All tutors and students on TutorLink are identity-verified. Connect safely online first, meet offline later.</div>
+  </main>
+</div>
+<p class="doc-foot">TutorLink · Group 4 · Applications &amp; Demo Class</p>
+</body>
+</html>
