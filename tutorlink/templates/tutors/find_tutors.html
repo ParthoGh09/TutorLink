@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:s.id>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Tutors | TutorLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 32px 16px; background: #F1F4F9; color: #1F2A5C;
+               font-family: 'Poppins', sans-serif; }
+        .page { max-width: 1100px; margin: 0 auto; }
+        .back { font-size: 13px; color: #FF6B5B; text-decoration: none; }
+        h1 { font-family: 'Lora', serif; font-size: 30px; margin: 8px 0 4px; }
+        .sub { font-size: 13px; color: #6B7390; margin-bottom: 20px; }
+
+        .layout { display: flex; gap: 20px; align-items: flex-start; }
+        .filters { width: 260px; background: #fff; border-radius: 20px; padding: 20px;
+                   box-shadow: 0 10px 30px rgba(31, 42, 92, 0.08); }
+        .filters label { display: block; font-size: 11px; font-weight: 600;
+                         text-transform: uppercase; margin: 14px 0 6px; }
+        .filters label:first-child { margin-top: 0; }
+        .filters input, .filters select { width: 100%; box-sizing: border-box; padding: 10px 12px;
+                         border: 1px solid #DDE2EE; border-radius: 10px;
+                         font-family: inherit; font-size: 13px; }
+        .btn { display: block; width: 100%; box-sizing: border-box; margin-top: 18px;
+               background: #1F2A5C; color: #fff; border: 0; border-radius: 12px; padding: 12px;
+               font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .reset { display: block; text-align: center; margin-top: 10px; font-size: 12px;
+                 color: #FF6B5B; text-decoration: none; }
+
+        .results { flex: 1; }
+        .count { font-weight: 600; margin-bottom: 12px; }
+
+        .tutor { display: flex; align-items: center; gap: 16px; background: #fff;
+                 border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
+                 box-shadow: 0 10px 30px rgba(31, 42, 92, 0.08); }
+        .avatar { width: 56px; height: 56px; border-radius: 50%; background: #E7F8F1;
+                  color: #12A783; display: flex; align-items: center; justify-content: center;
+                  font-weight: 600; font-size: 22px; flex-shrink: 0; }
+        .info { flex: 1; }
+        .name { font-weight: 600; font-size: 16px; }
+        .verified { color: #12A783; font-size: 12px; margin-left: 6px; }
+        .meta { font-size: 12px; color: #6B7390; margin-top: 2px; }
+        .chip { display: inline-block; background: #E4E9FF; border-radius: 8px;
+                padding: 2px 8px; font-size: 11px; margin: 6px 6px 0 0; }
+        .chip.mode { background: #E7F8F1; color: #0F7A55; }
+        .price { text-align: right; }
+        .price b { font-size: 18px; }
+        .price span { display: block; font-size: 11px; color: #6B7390; }
+        .view { display: inline-block; margin-top: 8px; background: #1F2A5C; color: #fff;
+                padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+                text-decoration: none; }
+        .empty { background: #fff; border-radius: 20px; padding: 40px; text-align: center;
+                 color: #6B7390; }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <a href="{% url 'student_dashboard' %}" class="back">← Back to Home</a>
+    <h1>Find Tutors</h1>
+    <div class="sub">Search verified tutors by subject, level, budget and area</div>
+
+    <div class="layout">
+
+        <form method="get" class="filters">
+            <label>Search tutor</label>
+            <input type="text" name="q" value="{{ filters.q }}" placeholder="Search by name...">
+
+            <label>Subject</label>
+            <select name="subject">
+                <option value="">All subjects</option>
+                {% for s in subjects %}
+                <option value="{{ s.id }}" {% if filters.subject == s.id|stringformat:"d" %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Class level</label>
+            <select name="class_level">
+                <option value="">All levels</option>
+                {% for n in class_levels %}
+                <option value="{{ n }}" {% if filters.class_level == n|stringformat:"d" %}selected{% endif %}>Class {{ n }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Area</label>
+            <input type="text" name="area" value="{{ filters.area }}" placeholder="e.g. Dhanmondi">
+
+            <label>Max monthly budget (৳)</label>
+            <input type="number" name="max_budget" value="{{ filters.max_budget }}" placeholder="e.g. 6000">
+
+            <label>Teaching mode</label>
+            <select name="mode">
+                <option value="">Any</option>
+                <option value="ONLINE" {% if filters.mode == 'ONLINE' %}selected{% endif %}>Online</option>
+                <option value="OFFLINE" {% if filters.mode == 'OFFLINE' %}selected{% endif %}>Offline</option>
+            </select>
+
+            <label>Minimum rating</label>
+            <select name="min_rating">
+                <option value="">Any</option>
+                <option value="4.0" {% if filters.min_rating == '4.0' %}selected{% endif %}>4.0 &amp; up</option>
+                <option value="4.5" {% if filters.min_rating == '4.5' %}selected{% endif %}>4.5 &amp; up</option>
+            </select>
+
+            <button type="submit" class="btn">Apply Filters</button>
+            <a href="{% url 'find_tutors' %}" class="reset">Reset</a>
+        </form>
+
+        <div class="results">
+             <div class="count">{{ tutors|length }} tutors found</div>
+
+            {% for t in tutors %}
+            <div class="tutor">
+                <div class="avatar">{{ t.user.username|slice:":1"|upper }}</div>
+                <div class="info">
+                    <div class="name">{{ t.user.get_full_name|default:t.user.username }}
+                        <span class="verified">✓ Verified</span></div>
+                    <div class="meta">{{ t.department }} · {{ t.university }}</div>
+                    <div>
+                        {% for s in t.subjects.all %}<span class="chip">{{ s.name }}</span>{% endfor %}
+                        <span class="chip">Class {{ t.class_from }}–{{ t.class_to }}</span>
+                        <span class="chip mode">{{ t.get_mode_display }}</span>
+                    </div>
+                    <div class="meta">★ {{ t.rating }} ({{ t.review_count }} reviews) · 📍 {{ t.user.area }} · 🕒 {{ t.available_time }}</div>
+                </div>
+                <div class="price">
+                    <b>৳{{ t.expected_salary|floatformat:0 }}</b>
+                    <span>expected / month</span>
+                    <a href="{% url 'tutor_profile' t.pk %}" class="view">View Profile</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty">No tutors match your filters.</div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
