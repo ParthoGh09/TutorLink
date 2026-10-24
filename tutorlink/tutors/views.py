@@ -28,44 +28,35 @@ def find_tutors(request):
         .prefetch_related('subjects')
     )
 
-    q = request.GET.get('q', '').strip()
-    subject = request.GET.get('subject', '')
+    subject = request.GET.get('subject', '').strip()
     class_level = request.GET.get('class_level', '')
     area = request.GET.get('area', '').strip()
     max_budget = request.GET.get('max_budget', '').strip()
-    mode = request.GET.get('mode', '')
-    min_rating = request.GET.get('min_rating', '')
 
-    if q:
-        tutors = tutors.filter(
-            Q(user__first_name__icontains=q)
-            | Q(user__last_name__icontains=q)
-            | Q(user__username__icontains=q)
-        )
-    if subject.isdigit():
-        tutors = tutors.filter(subjects__id=subject)
+    if subject:
+        tutors = tutors.filter(subjects__name__icontains=subject)
     if class_level.isdigit():
         tutors = tutors.filter(class_from__lte=int(class_level), class_to__gte=int(class_level))
     if area:
         tutors = tutors.filter(user__area__icontains=area)
     if max_budget.isdigit():
         tutors = tutors.filter(expected_salary__lte=max_budget)
-    if mode in ('ONLINE', 'OFFLINE'):
-        tutors = tutors.filter(Q(mode=mode) | Q(mode=TutorProfile.Mode.BOTH))
-    try:
-        if min_rating:
-            tutors = tutors.filter(rating__gte=float(min_rating))
-    except ValueError:
-        pass
 
-    tutors = tutors.distinct().order_by('-rating', '-review_count')
+    tutors = list(tutors.distinct().order_by('-rating', '-review_count'))
+
+    avg_rating = None
+    if tutors:
+        avg_rating = round(sum(float(t.rating) for t in tutors) / len(tutors), 1)
 
     return render(request, 'tutors/find_tutors.html', {
         'tutors': tutors,
         'subjects': Subject.objects.all().order_by('name'),
         'class_levels': range(1, 13),
         'filters': request.GET,
+        'avg_rating': avg_rating,
+        'role_name': 'Student',
     })
+
 
 @login_required
 def tutor_profile(request, pk):

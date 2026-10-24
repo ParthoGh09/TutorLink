@@ -1,141 +1,217 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:s.id>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Tutors | TutorLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; padding: 32px 16px; background: #F1F4F9; color: #1F2A5C;
-               font-family: 'Poppins', sans-serif; }
-        .page { max-width: 1100px; margin: 0 auto; }
-        .back { font-size: 13px; color: #FF6B5B; text-decoration: none; }
-        h1 { font-family: 'Lora', serif; font-size: 30px; margin: 8px 0 4px; }
-        .sub { font-size: 13px; color: #6B7390; margin-bottom: 20px; }
+{% extends 'accounts/dashboards/base_dashboard.html' %}
 
-        .layout { display: flex; gap: 20px; align-items: flex-start; }
-        .filters { width: 260px; background: #fff; border-radius: 20px; padding: 20px;
-                   box-shadow: 0 10px 30px rgba(31, 42, 92, 0.08); }
-        .filters label { display: block; font-size: 11px; font-weight: 600;
-                         text-transform: uppercase; margin: 14px 0 6px; }
-        .filters label:first-child { margin-top: 0; }
-        .filters input, .filters select { width: 100%; box-sizing: border-box; padding: 10px 12px;
-                         border: 1px solid #DDE2EE; border-radius: 10px;
-                         font-family: inherit; font-size: 13px; }
-        .btn { display: block; width: 100%; box-sizing: border-box; margin-top: 18px;
-               background: #1F2A5C; color: #fff; border: 0; border-radius: 12px; padding: 12px;
-               font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
-        .reset { display: block; text-align: center; margin-top: 10px; font-size: 12px;
-                 color: #FF6B5B; text-decoration: none; }
+{% block title %}Find Tutors{% endblock %}
+{% block heading %}Find Tutors{% endblock %}
 
-        .results { flex: 1; }
-        .count { font-weight: 600; margin-bottom: 12px; }
+{% block nav %}
+<a href="#" class="px-4 py-2 rounded-lg hover:bg-white/20">Post a Tuition Need</a>
+<a href="{% url 'find_tutors' %}" class="px-4 py-2 rounded-lg bg-white text-blue-700 font-semibold">Find Tutors</a>
+<a href="#" class="px-4 py-2 rounded-lg hover:bg-white/20">Applications</a>
+<a href="#" class="px-4 py-2 rounded-lg hover:bg-white/20">Demo Classes</a>
+<a href="#" class="px-4 py-2 rounded-lg hover:bg-white/20">Messages</a>
+{% endblock %}
 
-        .tutor { display: flex; align-items: center; gap: 16px; background: #fff;
-                 border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
-                 box-shadow: 0 10px 30px rgba(31, 42, 92, 0.08); }
-        .avatar { width: 56px; height: 56px; border-radius: 50%; background: #E7F8F1;
-                  color: #12A783; display: flex; align-items: center; justify-content: center;
-                  font-weight: 600; font-size: 22px; flex-shrink: 0; }
-        .info { flex: 1; }
-        .name { font-weight: 600; font-size: 16px; }
-        .verified { color: #12A783; font-size: 12px; margin-left: 6px; }
-        .meta { font-size: 12px; color: #6B7390; margin-top: 2px; }
-        .chip { display: inline-block; background: #E4E9FF; border-radius: 8px;
-                padding: 2px 8px; font-size: 11px; margin: 6px 6px 0 0; }
-        .chip.mode { background: #E7F8F1; color: #0F7A55; }
-        .price { text-align: right; }
-        .price b { font-size: 18px; }
-        .price span { display: block; font-size: 11px; color: #6B7390; }
-        .view { display: inline-block; margin-top: 8px; background: #1F2A5C; color: #fff;
-                padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
-                text-decoration: none; }
-        .empty { background: #fff; border-radius: 20px; padding: 40px; text-align: center;
-                 color: #6B7390; }
-    </style>
-</head>
-<body>
-<div class="page">
+{% block content %}
 
-    <a href="{% url 'student_dashboard' %}" class="back">← Back to Home</a>
-    <h1>Find Tutors</h1>
-    <div class="sub">Search verified tutors by subject, level, budget and area</div>
-
-    <div class="layout">
-
-        <form method="get" class="filters">
-            <label>Search tutor</label>
-            <input type="text" name="q" value="{{ filters.q }}" placeholder="Search by name...">
-
-            <label>Subject</label>
-            <select name="subject">
-                <option value="">All subjects</option>
-                {% for s in subjects %}
-                <option value="{{ s.id }}" {% if filters.subject == s.id|stringformat:"d" %}selected{% endif %}>{{ s.name }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Class level</label>
-            <select name="class_level">
-                <option value="">All levels</option>
-                {% for n in class_levels %}
-                <option value="{{ n }}" {% if filters.class_level == n|stringformat:"d" %}selected{% endif %}>Class {{ n }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Area</label>
-            <input type="text" name="area" value="{{ filters.area }}" placeholder="e.g. Dhanmondi">
-
-            <label>Max monthly budget (৳)</label>
-            <input type="number" name="max_budget" value="{{ filters.max_budget }}" placeholder="e.g. 6000">
-
-            <label>Teaching mode</label>
-            <select name="mode">
-                <option value="">Any</option>
-                <option value="ONLINE" {% if filters.mode == 'ONLINE' %}selected{% endif %}>Online</option>
-                <option value="OFFLINE" {% if filters.mode == 'OFFLINE' %}selected{% endif %}>Offline</option>
-            </select>
-
-            <label>Minimum rating</label>
-            <select name="min_rating">
-                <option value="">Any</option>
-                <option value="4.0" {% if filters.min_rating == '4.0' %}selected{% endif %}>4.0 &amp; up</option>
-                <option value="4.5" {% if filters.min_rating == '4.5' %}selected{% endif %}>4.5 &amp; up</option>
-            </select>
-
-            <button type="submit" class="btn">Apply Filters</button>
-            <a href="{% url 'find_tutors' %}" class="reset">Reset</a>
-        </form>
-
-        <div class="results">
-             <div class="count">{{ tutors|length }} tutors found</div>
-
-            {% for t in tutors %}
-            <div class="tutor">
-                <div class="avatar">{{ t.user.username|slice:":1"|upper }}</div>
-                <div class="info">
-                    <div class="name">{{ t.user.get_full_name|default:t.user.username }}
-                        <span class="verified">✓ Verified</span></div>
-                    <div class="meta">{{ t.department }} · {{ t.university }}</div>
-                    <div>
-                        {% for s in t.subjects.all %}<span class="chip">{{ s.name }}</span>{% endfor %}
-                        <span class="chip">Class {{ t.class_from }}–{{ t.class_to }}</span>
-                        <span class="chip mode">{{ t.get_mode_display }}</span>
-                    </div>
-                    <div class="meta">★ {{ t.rating }} ({{ t.review_count }} reviews) · 📍 {{ t.user.area }} · 🕒 {{ t.available_time }}</div>
-                </div>
-                <div class="price">
-                    <b>৳{{ t.expected_salary|floatformat:0 }}</b>
-                    <span>expected / month</span>
-                    <a href="{% url 'tutor_profile' t.pk %}" class="view">View Profile</a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="empty">No tutors match your filters.</div>
-            {% endfor %}
+<!-- Hero banner -->
+<div class="bg-navy text-white rounded-3xl p-7 md:p-9 mb-6">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+        <div>
+            <p class="text-sm text-slate-300">Tutor directory</p>
+            <h2 class="text-3xl font-bold font-serif mt-1">Find a tutor who fits your needs.</h2>
+            <p class="text-sm text-slate-300 mt-3 max-w-2xl">
+                Search verified tutors by subject, class level, budget and area, then book a free online demo class before you commit.
+            </p>
         </div>
-
+        <a href="{% url 'student_dashboard' %}"
+           class="px-4 py-2.5 rounded-xl bg-sunshine text-navy text-sm font-bold text-center whitespace-nowrap">
+            ← Back to Home
+        </a>
     </div>
 </div>
-</body>
-</html>
+
+<!-- Stat cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-2xl border p-5">
+        <div class="text-[11px] font-bold tracking-widest text-slate-400">TUTORS FOUND</div>
+        <div class="flex items-center justify-between mt-2">
+            <span class="text-2xl font-bold text-navy">{{ tutors|length }}</span>
+            <span class="w-11 h-11 rounded-xl bg-sunshine flex items-center justify-center text-xl">🔎</span>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl border p-5">
+        <div class="text-[11px] font-bold tracking-widest text-slate-400">SUBJECTS</div>
+        <div class="flex items-center justify-between mt-2">
+            <span class="text-2xl font-bold text-navy">{{ subjects|length }}</span>
+            <span class="w-11 h-11 rounded-xl bg-sunshine flex items-center justify-center text-xl">📚</span>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl border p-5">
+        <div class="text-[11px] font-bold tracking-widest text-slate-400">AVG. RATING</div>
+        <div class="flex items-center justify-between mt-2">
+            <span class="text-2xl font-bold text-navy">{% if avg_rating %}{{ avg_rating }}{% else %}–{% endif %}</span>
+            <span class="w-11 h-11 rounded-xl bg-sunshine flex items-center justify-center text-xl">⭐</span>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl border p-5">
+        <div class="text-[11px] font-bold tracking-widest text-slate-400">FIRST CLASS</div>
+        <div class="flex items-center justify-between mt-2">
+            <span class="text-2xl font-bold text-navy">Free Demo</span>
+            <span class="w-11 h-11 rounded-xl bg-mint flex items-center justify-center text-xl">💻</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main layout: filters | tutors | info -->
+<div class="grid lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Filters -->
+    <aside class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-4">
+        <div class="bg-white rounded-2xl border p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold font-serif text-navy text-lg">Filter Tutors</h3>
+                {% if filters %}
+                <a href="{% url 'find_tutors' %}" class="text-xs font-semibold text-blue-600 hover:underline">Clear</a>
+                {% endif %}
+            </div>
+
+            <form method="get" class="space-y-4">
+                <div>
+                    <label for="subject" class="block text-xs font-bold text-slate-600 mb-1.5">Subject</label>
+                    <input id="subject" type="text" name="subject" value="{{ filters.subject }}"
+       list="subject-list" placeholder="e.g. Math, Physics" autocomplete="off"
+       class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+<datalist id="subject-list">
+    {% for s in subjects %}<option value="{{ s.name }}">{% endfor %}
+</datalist>
+                </div>
+
+                <div>
+                    <label for="class_level" class="block text-xs font-bold text-slate-600 mb-1.5">Class</label>
+                    <select id="class_level" name="class_level"
+                            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                        <option value="">All classes</option>
+                        {% for n in class_levels %}
+                        <option value="{{ n }}" {% if filters.class_level == n|stringformat:"d" %}selected{% endif %}>Class {{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="area" class="block text-xs font-bold text-slate-600 mb-1.5">Area</label>
+                    <input id="area" type="text" name="area" value="{{ filters.area }}" placeholder="e.g. Dhanmondi"
+                           class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                </div>
+
+                <div>
+                    <label for="max_budget" class="block text-xs font-bold text-slate-600 mb-1.5">Max monthly budget (৳)</label>
+                    <input id="max_budget" type="number" min="0" name="max_budget" value="{{ filters.max_budget }}" placeholder="e.g. 6000"
+                           class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                </div>
+
+                <button type="submit"
+                        class="w-full rounded-xl bg-navy hover:bg-blue-700 text-white text-sm font-bold py-3 transition">
+                    Apply Filters
+                </button>
+            </form>
+
+            <hr class="my-4">
+            <p class="text-xs text-slate-500">🔒 Only identity-verified tutors are listed.</p>
+        </div>
+    </aside>
+
+    <!-- Tutor results -->
+    <section class="lg:col-span-8 xl:col-span-6">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold font-serif text-navy text-lg">Available Tutors</h3>
+            <span class="text-xs text-slate-500">{{ tutors|length }} result{{ tutors|length|pluralize }}</span>
+        </div>
+
+        <div class="space-y-4">
+            {% for t in tutors %}
+            <article class="bg-white rounded-2xl border p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+                <div class="flex gap-4">
+
+                    {% if t.user.profile_picture %}
+                    <img src="{{ t.user.profile_picture.url }}" alt=""
+                         class="w-14 h-14 rounded-2xl object-cover shrink-0">
+                    {% else %}
+                    <div class="w-14 h-14 rounded-2xl bg-mint text-success flex items-center justify-center text-2xl font-bold shrink-0">
+                        {{ t.user.first_name|default:t.user.username|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h4 class="font-bold font-serif text-navy text-lg">
+                                        {{ t.user.get_full_name|default:t.user.username }}
+                                    </h4>
+                                    <span class="px-2 py-0.5 rounded-full bg-mint text-success text-[11px] font-bold">✓ Verified</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    {% for s in t.subjects.all %}
+                                    <span class="px-2.5 py-1 rounded-full bg-sunshine text-navy text-xs font-semibold">{{ s.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <div class="text-xs text-slate-500">Expected salary</div>
+                                <div class="text-xl font-bold text-navy">৳{{ t.expected_salary|floatformat:0 }}</div>
+                                <div class="text-[11px] text-slate-400">per month</div>
+                            </div>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-x-4 gap-y-1.5 mt-4 text-[13px] text-slate-500">
+                            <p>🎓 {{ t.department }}, {{ t.university }}</p>
+                            <p>📍 {{ t.user.area|default:"Area not set" }}</p>
+                            <p>📘 Class {{ t.class_from }}–{{ t.class_to }} · {{ t.get_mode_display }}</p>
+                            <p>🕒 {{ t.available_time|default:"Time not set" }}</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t">
+                            <div class="flex items-center gap-3 text-sm">
+                                <span class="font-bold text-navy">⭐ {{ t.rating }}</span>
+                                <span class="text-xs text-slate-500">({{ t.review_count }} reviews)</span>
+                                <span class="text-xs text-slate-400">·</span>
+                                <span class="text-xs text-slate-500">{{ t.experience_years }} yr{{ t.experience_years|pluralize }} experience</span>
+                            </div>
+                            <a href="{% url 'tutor_profile' t.pk %}"
+                               class="px-4 py-2 rounded-xl bg-navy hover:bg-blue-700 text-white text-sm font-bold transition">
+                                View Profile →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="bg-white rounded-2xl border p-10 text-center">
+                <div class="w-12 h-12 mx-auto rounded-xl bg-sunshine flex items-center justify-center text-xl mb-3">🔍</div>
+                <h4 class="font-bold font-serif text-navy text-lg">No tutors found</h4>
+                <p class="text-sm text-slate-500 mt-1 mb-4">Try a different subject, area or budget.</p>
+                <a href="{% url 'find_tutors' %}"
+                   class="inline-block px-4 py-2 rounded-xl bg-navy text-white text-sm font-bold">Show all tutors</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Info panels -->
+    <aside class="lg:col-span-12 xl:col-span-3 grid md:grid-cols-2 xl:grid-cols-1 gap-4">
+        <div class="bg-white rounded-2xl border p-5">
+            <div class="w-11 h-11 rounded-xl bg-sunshine flex items-center justify-center text-xl mb-3">💻</div>
+            <h4 class="font-bold font-serif text-navy text-lg">Start with a demo class</h4>
+            <p class="text-xs text-slate-500 mt-1 mb-4">
+                Open a tutor's profile to pick a date, time and platform (Google Meet or Zoom) for your online demo.
+            </p>
+            <a href="#" class="block text-center px-4 py-2.5 rounded-xl border border-blue-200 text-blue-700 text-sm font-bold hover:bg-sunshine">
+                My Demo Classes
+            </a>
+        </div>
+
+    </aside>
+
+</div>
+{% endblock %}
