@@ -1,20 +1,8 @@
-from datetime import date, time as dtime
-
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
+from django.shortcuts import redirect, render
 
 from accounts.models import User
-from .models import DemoClass, Subject, TutorProfile
-
-# Demo time choices: 4:00 PM to 9:00 PM, as (value, label)
-TIME_SLOTS = [
-    (f'{h:02d}:00', f'{h % 12 or 12}:00 {"AM" if h < 12 else "PM"}')
-    for h in range(16, 22)
-]
+from .models import Subject, TutorProfile
 
 
 @login_required
@@ -29,7 +17,7 @@ def find_tutors(request):
     )
 
     subject = request.GET.get('subject', '').strip()
-    class_level = request.GET.get('class_level', '')
+    class_level = ''.join(ch for ch in request.GET.get('class_level', '') if ch.isdigit())
     area = request.GET.get('area', '').strip()
     max_budget = request.GET.get('max_budget', '').strip()
 
@@ -55,63 +43,4 @@ def find_tutors(request):
         'filters': request.GET,
         'avg_rating': avg_rating,
         'role_name': 'Student',
-    })
-
-
-@login_required
-def tutor_profile(request, pk):
-    if request.user.role != User.Role.STUDENT:
-        return redirect('role_dashboard')
-
-    tutor = get_object_or_404(
-        TutorProfile.objects.select_related('user').prefetch_related('subjects'),
-        pk=pk, user__is_verified=True,
-    )
-    existing_demo = DemoClass.objects.filter(student=request.user, tutor=tutor).first()
-
-    if request.method == 'POST':
-        if existing_demo:
-            messages.warning(request, 'You have already requested a demo with this tutor.')
-            return redirect('tutor_profile', pk=tutor.pk)
-
-        subject_id = request.POST.get('subject', '')
-        time_text = request.POST.get('time', '')
-        platform = request.POST.get('platform', '')
-
-        try:
-            demo_date = date.fromisoformat(request.POST.get('date', ''))
-        except ValueError:
-            demo_date = None
-
-        subject = tutor.subjects.filter(pk=subject_id).first() if subject_id.isdigit() else None
-
-        if demo_date is None or demo_date < timezone.localdate():
-            messages.error(request, 'Please choose a valid date (today or later).')
-        elif time_text not in [value for value, label in TIME_SLOTS]:
-            messages.error(request, 'Please choose a valid time.')
-        elif platform not in DemoClass.Platform.values:
-            messages.error(request, 'Please choose Google Meet or Zoom.')
-        elif subject_id and subject is None:
-            messages.error(request, "Please choose one of this tutor's subjects.")
-        else:
-            try:
-                DemoClass.objects.create(
-                    student=request.user,
-                    tutor=tutor,
-                    subject=subject,
-                    date=demo_date,
-                    time=dtime.fromisoformat(time_text),
-                    platform=platform,
-                )
-                messages.success(request, 'Demo class requested! The tutor will confirm the time.')
-            except IntegrityError:
-                messages.warning(request, 'You have already requested a demo with this tutor.')
-
-        return redirect('tutor_profile', pk=tutor.pk)
-
-    return render(request, 'tutors/tutor_profile.html', {
-        'tutor': tutor,
-        'existing_demo': existing_demo,
-        'time_slots': TIME_SLOTS,
-        'today': timezone.localdate(),
     })

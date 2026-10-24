@@ -79,22 +79,21 @@
                 <div>
                     <label for="subject" class="block text-xs font-bold text-slate-600 mb-1.5">Subject</label>
                     <input id="subject" type="text" name="subject" value="{{ filters.subject }}"
-       list="subject-list" placeholder="e.g. Math, Physics" autocomplete="off"
-       class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-<datalist id="subject-list">
-    {% for s in subjects %}<option value="{{ s.name }}">{% endfor %}
-</datalist>
+                           list="subject-list" placeholder="e.g. Math, Physics" autocomplete="off"
+                           class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                    <datalist id="subject-list">
+                        {% for s in subjects %}<option value="{{ s.name }}">{% endfor %}
+                    </datalist>
                 </div>
 
                 <div>
                     <label for="class_level" class="block text-xs font-bold text-slate-600 mb-1.5">Class</label>
-                    <select id="class_level" name="class_level"
-                            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                        <option value="">All classes</option>
-                        {% for n in class_levels %}
-                        <option value="{{ n }}" {% if filters.class_level == n|stringformat:"d" %}selected{% endif %}>Class {{ n }}</option>
-                        {% endfor %}
-                    </select>
+                    <input id="class_level" type="text" name="class_level" value="{{ filters.class_level }}"
+                           list="class-list" placeholder="e.g. 7 or Class 9" autocomplete="off"
+                           class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                    <datalist id="class-list">
+                        {% for n in class_levels %}<option value="Class {{ n }}">{% endfor %}
+                    </datalist>
                 </div>
 
                 <div>
@@ -178,10 +177,6 @@
                                 <span class="text-xs text-slate-400">·</span>
                                 <span class="text-xs text-slate-500">{{ t.experience_years }} yr{{ t.experience_years|pluralize }} experience</span>
                             </div>
-                            <a href="{% url 'tutor_profile' t.pk %}"
-                               class="px-4 py-2 rounded-xl bg-navy hover:bg-blue-700 text-white text-sm font-bold transition">
-                                View Profile →
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -204,7 +199,7 @@
             <div class="w-11 h-11 rounded-xl bg-sunshine flex items-center justify-center text-xl mb-3">💻</div>
             <h4 class="font-bold font-serif text-navy text-lg">Start with a demo class</h4>
             <p class="text-xs text-slate-500 mt-1 mb-4">
-                Open a tutor's profile to pick a date, time and platform (Google Meet or Zoom) for your online demo.
+                Every tutor offers an online demo class on Google Meet or Zoom before you commit.
             </p>
             <a href="#" class="block text-center px-4 py-2.5 rounded-xl border border-blue-200 text-blue-700 text-sm font-bold hover:bg-sunshine">
                 My Demo Classes
