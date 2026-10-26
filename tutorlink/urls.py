@@ -1,7 +1,17 @@
+﻿
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import include, path
 
+
+def root_redirect(request):
+    return redirect("role_dashboard")
+
+
 urlpatterns = [
+    path("", root_redirect, name="root"),
     path("admin/", admin.site.urls),
-    path("", include("tuition.urls")),
+    path("accounts/", include("accounts.urls")),
+    path("tutors/", include("tutors.urls")),
+    path("tuitions/", include("tuitions.urls")),
 ]

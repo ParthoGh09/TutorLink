@@ -1,6 +1,8 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+import sys
+sys.path.insert(0, str(BASE_DIR / 'tutorlink'))
 
 SECRET_KEY = "dev-only-secret-key-change-me"
 DEBUG = True
@@ -13,7 +15,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "tuition",
+    "accounts",
+    "tutors",
+    "tuitions",
 ]
 
 MIDDLEWARE = [
@@ -63,3 +67,9 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+
+AUTH_USER_MODEL = "accounts.User"
+
