@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tuition Posts</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 15px;
+        }
+
+        .post {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 18px;
+        }
+
+        .post-image {
+            max-width: 100%;
+            width: 350px;
+            max-height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 12px 0;
+            border-radius: 8px;
+        }
+
+        a, button {
+            display: inline-block;
+            padding: 9px 12px;
+            margin: 5px 3px;
+            cursor: pointer;
+        }
+
+        .delete {
+            background: #c62828;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Tuition Posts</h1>
+
+    <a href="{% url 'tuitions:create_post' %}">
+        Create Tuition Post
+    </a>
+
+    {% for post in posts %}
+        <div class="post">
+            <h2>{{ post.subject }} - {{ post.class_level }}</h2>
+
+            {% if post.image %}
+                <img
+                    src="{{ post.image.url }}"
+                    alt="Picture for {{ post.subject }}"
+                    class="post-image"
+                >
+            {% endif %}
+
+            <p><strong>Posted by:</strong> {{ post.student }}</p>
+
+            <p>
+                <strong>Description:</strong>
+                {{ post.description }}
+            </p>
+
+            <p>
+                <strong>Budget:</strong>
+                ৳{{ post.budget_min }} - ৳{{ post.budget_max }}
+            </p>
+
+            <p>
+                <strong>Location:</strong>
+                {{ post.area }}, {{ post.district }}, {{ post.division }}
+            </p>
+
+            <p>
+                <strong>Preferred days:</strong>
+                {{ post.preferred_days }}
+            </p>
+
+            <p><strong>Time:</strong> {{ post.time_slot }}</p>
+
+            <p>
+                <strong>Mode:</strong>
+                {{ post.get_teaching_mode_display }}
+            </p>
+
+            <p><strong>Status:</strong> {{ post.status }}</p>
+
+            {% if post.student_id == request.user.pk or request.user.is_superuser or request.user.role == "ADMIN" %}
+                <a href="{% url 'tuitions:edit_post' post.pk %}">
+                    Edit
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'tuitions:delete_post' post.pk %}"
+                    style="display:inline"
+                    onsubmit="return confirm('Delete this post?');"
+                >
+                    {% csrf_token %}
+                    <button class="delete" type="submit">
+                        Delete
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No tuition posts available.</p>
+    {% endfor %}
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>
