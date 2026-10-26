@@ -1,79 +1,245 @@
 
 {% extends 'accounts/dashboards/base_dashboard.html' %}
+
 {% block title %}Student Dashboard{% endblock %}
 {% block heading %}Student Home{% endblock %}
 
 {% block nav %}
-<a href="{% url 'tuitions:create_post' %}" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Post a Tuition Need</a>
-<a href="{% url 'find_tutors' %}" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tutors</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Applications</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
-<a href="{% url 'tuitions:post_list' %}" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">View Tuition Posts</a>
+<a href="{% url 'tuitions:create_post' %}"
+   class="px-3 py-2 rounded-lg hover:bg-white/10 transition whitespace-nowrap">
+    Post a Tuition Need
+</a>
+
+<a href="{% url 'find_tutors' %}"
+   class="px-3 py-2 rounded-lg hover:bg-white/10 transition whitespace-nowrap">
+    Find Tutors
+</a>
+
+<a href="#"
+   class="px-3 py-2 rounded-lg hover:bg-white/10 transition whitespace-nowrap">
+    Applications
+</a>
+
+<a href="#"
+   class="px-3 py-2 rounded-lg hover:bg-white/10 transition whitespace-nowrap">
+    Demo Classes
+</a>
+
+<a href="#"
+   class="px-3 py-2 rounded-lg hover:bg-white/10 transition whitespace-nowrap">
+    Messages
+</a>
 {% endblock %}
 
+
 {% block content %}
-<div class="bg-navy text-white rounded-3xl p-7 md:p-9 mb-6">
-    <p class="text-sm text-slate-300">
-        Welcome back, {{ user.first_name|default:user.username }} 👋
-    </p>
 
-    <h2 class="text-3xl font-bold font-serif mt-1">
-        Find a tutor who fits your needs.
-    </h2>
+<!-- Welcome Hero Section -->
+<section class="relative overflow-hidden rounded-3xl p-7 md:p-10 mb-7
+                bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-800
+                text-white shadow-xl">
 
-    <p class="text-sm text-slate-300 mt-3 max-w-2xl">
-        Search verified tutors, publish a tuition need and use the online-first demo flow described in the TutorLink design.
-    </p>
-
-    <div class="mt-6 flex flex-wrap gap-3">
-        <a href="{% url 'find_tutors' %}" class="px-4 py-2.5 rounded-xl bg-sunshine text-navy text-sm font-bold">
-            Find Tutors
-        </a>
-
-        <a href="{% url 'tuitions:create_post' %}" class="px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-semibold">
-            Post a Tuition Need
-        </a>
-
-        <a href="{% url 'tuitions:post_list' %}" class="px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-semibold">
-            View Tuition Posts
-        </a>
-    </div>
-</div>
-
-<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-    <a href="{% url 'find_tutors' %}" class="block bg-white rounded-2xl border p-5 hover:shadow-lg transition">
-        <div class="text-2xl">🔎</div>
-        <h3 class="font-bold text-navy mt-3">Find Tutors</h3>
-        <p class="text-xs text-slate-500 mt-1">
-            Filter by subject, level, budget and area.
-        </p>
-    </a>
-
-    <a href="{% url 'tuitions:create_post' %}" class="block bg-white rounded-2xl border p-5 hover:shadow-lg transition">
-        <div class="text-2xl">📝</div>
-        <h3 class="font-bold text-navy mt-3">Post a Tuition Need</h3>
-        <p class="text-xs text-slate-500 mt-1">
-            Publish your tuition requirement.
-        </p>
-    </a>
-
-    <a href="{% url 'tuitions:post_list' %}" class="block bg-white rounded-2xl border p-5 hover:shadow-lg transition">
-        <div class="text-2xl">📚</div>
-        <h3 class="font-bold text-navy mt-3">Tuition Posts</h3>
-        <p class="text-xs text-slate-500 mt-1">
-            View, edit and delete your tuition posts.
-        </p>
-    </a>
-
-    <div class="bg-white rounded-2xl border p-5">
-        <div class="text-2xl">📋</div>
-        <h3 class="font-bold text-navy mt-3">Applications</h3>
-        <p class="text-xs text-slate-500 mt-1">
-            Track tutor applications and decisions.
-        </p>
+    <!-- Decorative Gradient Circles -->
+    <div class="absolute -top-20 -right-16 w-64 h-64
+                rounded-full bg-blue-400/20 blur-3xl pointer-events-none">
     </div>
 
+    <div class="absolute -bottom-24 right-1/3 w-56 h-56
+                rounded-full bg-indigo-400/20 blur-3xl pointer-events-none">
+    </div>
+
+    <div class="relative z-10">
+
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 mb-5
+                    rounded-full bg-white/10 border border-white/15
+                    text-xs font-medium text-blue-100">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Student Dashboard
+        </div>
+
+        <p class="text-sm text-blue-200">
+            Welcome back, {{ user.first_name|default:user.username }} 👋
+        </p>
+
+        <h2 class="text-3xl md:text-4xl font-bold font-serif mt-2 leading-tight">
+            Find a tutor who fits your needs.
+        </h2>
+
+        <p class="text-sm md:text-base text-blue-100/80 mt-4 max-w-2xl leading-7">
+            Search verified tutors, publish a tuition need and use the
+            online-first demo flow described in the TutorLink design.
+        </p>
+
+        <!-- Hero Buttons -->
+        <div class="mt-7 flex flex-wrap gap-3">
+
+            <a href="{% url 'find_tutors' %}"
+               class="inline-flex items-center gap-2 px-5 py-3 rounded-xl
+                      bg-white text-blue-950 text-sm font-bold
+                      shadow-lg hover:bg-blue-50 hover:-translate-y-0.5
+                      transition duration-200">
+                🔎 Find Tutors
+            </a>
+
+            <a href="{% url 'tuitions:create_post' %}"
+               class="inline-flex items-center gap-2 px-5 py-3 rounded-xl
+                      bg-blue-500/20 border border-blue-200/30
+                      text-white text-sm font-semibold
+                      hover:bg-blue-500/35 transition duration-200">
+                📝 Post a Tuition Need
+            </a>
+
+            <a href="{% url 'tuitions:post_list' %}"
+               class="inline-flex items-center gap-2 px-5 py-3 rounded-xl
+                      bg-white/10 border border-white/20
+                      text-white text-sm font-semibold
+                      hover:bg-white/20 transition duration-200">
+                📚 View Tuition Posts
+            </a>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- Dashboard Cards -->
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+    <!-- Find Tutors Card -->
+    <a href="{% url 'find_tutors' %}"
+       class="group relative overflow-hidden block rounded-2xl
+              border border-blue-100 bg-gradient-to-br from-white to-blue-50
+              p-5 shadow-sm hover:shadow-xl hover:-translate-y-1
+              transition duration-300">
+
+        <div class="absolute top-0 right-0 w-24 h-24 rounded-full
+                    bg-blue-100/60 blur-2xl
+                    group-hover:bg-blue-200/70 transition">
+        </div>
+
+        <div class="relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br
+                        from-blue-500 to-indigo-600 text-white
+                        flex items-center justify-center text-2xl shadow-md">
+                🔎
+            </div>
+
+            <h3 class="font-bold text-slate-800 mt-4 group-hover:text-blue-700 transition">
+                Find Tutors
+            </h3>
+
+            <p class="text-xs text-slate-500 mt-2 leading-5">
+                Filter by subject, level, budget and area.
+            </p>
+
+            <div class="mt-4 text-xs font-semibold text-blue-600">
+                Explore tutors →
+            </div>
+        </div>
+    </a>
+
+
+    <!-- Post Tuition Card -->
+    <a href="{% url 'tuitions:create_post' %}"
+       class="group relative overflow-hidden block rounded-2xl
+              border border-violet-100 bg-gradient-to-br from-white to-violet-50
+              p-5 shadow-sm hover:shadow-xl hover:-translate-y-1
+              transition duration-300">
+
+        <div class="absolute top-0 right-0 w-24 h-24 rounded-full
+                    bg-violet-100/60 blur-2xl
+                    group-hover:bg-violet-200/70 transition">
+        </div>
+
+        <div class="relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br
+                        from-violet-500 to-purple-600 text-white
+                        flex items-center justify-center text-2xl shadow-md">
+                📝
+            </div>
+
+            <h3 class="font-bold text-slate-800 mt-4 group-hover:text-violet-700 transition">
+                Post a Tuition Need
+            </h3>
+
+            <p class="text-xs text-slate-500 mt-2 leading-5">
+                Publish your tuition requirement.
+            </p>
+
+            <div class="mt-4 text-xs font-semibold text-violet-600">
+                Create a post →
+            </div>
+        </div>
+    </a>
+
+
+    <!-- Tuition Posts Card -->
+    <a href="{% url 'tuitions:post_list' %}"
+       class="group relative overflow-hidden block rounded-2xl
+              border border-cyan-100 bg-gradient-to-br from-white to-cyan-50
+              p-5 shadow-sm hover:shadow-xl hover:-translate-y-1
+              transition duration-300">
+
+        <div class="absolute top-0 right-0 w-24 h-24 rounded-full
+                    bg-cyan-100/60 blur-2xl
+                    group-hover:bg-cyan-200/70 transition">
+        </div>
+
+        <div class="relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br
+                        from-cyan-500 to-blue-600 text-white
+                        flex items-center justify-center text-2xl shadow-md">
+                📚
+            </div>
+
+            <h3 class="font-bold text-slate-800 mt-4 group-hover:text-cyan-700 transition">
+                Tuition Posts
+            </h3>
+
+            <p class="text-xs text-slate-500 mt-2 leading-5">
+                View, edit and delete your tuition posts.
+            </p>
+
+            <div class="mt-4 text-xs font-semibold text-cyan-700">
+                View posts →
+            </div>
+        </div>
+    </a>
+
+
+    <!-- Applications Card -->
+    <div class="group relative overflow-hidden rounded-2xl
+                border border-emerald-100 bg-gradient-to-br
+                from-white to-emerald-50 p-5 shadow-sm
+                hover:shadow-xl hover:-translate-y-1
+                transition duration-300">
+
+        <div class="absolute top-0 right-0 w-24 h-24 rounded-full
+                    bg-emerald-100/60 blur-2xl
+                    group-hover:bg-emerald-200/70 transition">
+        </div>
+
+        <div class="relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br
+                        from-emerald-500 to-teal-600 text-white
+                        flex items-center justify-center text-2xl shadow-md">
+                📋
+            </div>
+
+            <h3 class="font-bold text-slate-800 mt-4">
+                Applications
+            </h3>
+
+            <p class="text-xs text-slate-500 mt-2 leading-5">
+                Track tutor applications and decisions.
+            </p>
+
+            <div class="mt-4 text-xs font-semibold text-emerald-700">
+                Application tracking
+            </div>
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}

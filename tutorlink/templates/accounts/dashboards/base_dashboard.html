@@ -1,11 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Dashboard{% endblock %} | TutorLink</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -26,46 +29,109 @@
 
 <body class="bg-slate-100 min-h-screen text-slate-800">
 
-    <!-- Top Navbar -->
-    <nav class="bg-blue-600 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-5 py-4">
-            <div class="flex flex-wrap items-center justify-between gap-4">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-5">
+
+            <div class="flex items-center justify-between gap-4 min-h-[76px]">
 
                 <!-- Logo -->
-                <a href="{% url 'role_dashboard' %}" class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                <a href="{% url 'role_dashboard' %}"
+                   class="flex items-center gap-2 shrink-0">
+
+                    <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl">
                         🎓
                     </div>
 
                     <div>
-                        <div class="font-bold text-xl font-serif">TutorLink</div>
-                        <div class="text-[10px] text-blue-100">
+                        <div class="font-bold text-lg font-serif tracking-wide">
+                            TutorLink
+                        </div>
+                        <div class="text-[9px] text-blue-200">
                             Connect • Learn • Earn • Safety
                         </div>
                     </div>
                 </a>
 
-                <!-- Navigation Links -->
-                <div class="flex flex-wrap items-center gap-2 text-sm">
+                <!-- Navigation Links: One Line -->
+                <div class="flex items-center gap-1 text-sm font-medium whitespace-nowrap">
+
                     <a href="{% url 'role_dashboard' %}"
-                       class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30">
+                       class="px-3 py-2 rounded-lg hover:bg-white/10 transition">
                         Dashboard
                     </a>
 
+                    <a href="{% url 'tuitions:post_list' %}"
+                       class="px-3 py-2 rounded-lg hover:bg-white/10 transition">
+                        View Tuition Posts
+                    </a>
+
                     {% block nav %}{% endblock %}
+
                 </div>
 
-                <!-- User and Logout -->
-                <div class="flex items-center gap-4">
-                    <div class="text-sm">
-                        Signed in as
-                        <b>{{ user.get_full_name|default:user.username }}</b>
-                    </div>
+                <!-- Profile Dropdown -->
+                <div class="relative shrink-0" id="profileDropdown">
 
-                    <a href="{% url 'logout' %}"
-                       class="px-4 py-2 rounded-lg bg-white text-blue-700 text-sm font-semibold hover:bg-blue-50">
-                        Log out
-                    </a>
+                    <button
+                        type="button"
+                        id="profileButton"
+                        aria-expanded="false"
+                        aria-controls="profileMenu"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+
+                        <div class="w-8 h-8 rounded-full bg-blue-400/20 border border-white/20 flex items-center justify-center font-semibold text-sm">
+                            {{ user.username|first|upper }}
+                        </div>
+
+                        <span class="text-sm font-medium max-w-[150px] truncate">
+                            {{ user.get_full_name|default:user.username }}
+                        </span>
+
+                        <svg id="profileArrow"
+                             class="w-4 h-4 transition-transform duration-200"
+                             xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="m19 9-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="profileMenu"
+                         class="hidden absolute right-0 top-full mt-2 w-52 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <p class="text-xs text-slate-500">
+                                Signed in as
+                            </p>
+                            <p class="text-sm font-semibold truncate">
+                                {{ user.get_full_name|default:user.username }}
+                            </p>
+                        </div>
+
+                        <a href="{% url 'logout' %}"
+                           class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition">
+
+                            <svg class="w-5 h-5"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="1.8"
+                                      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M18 15l3-3m0 0-3-3m3 3H9"/>
+                            </svg>
+
+                            <span class="font-medium">Log out</span>
+                        </a>
+
+                    </div>
                 </div>
 
             </div>
@@ -76,9 +142,11 @@
     <main class="p-5 md:p-8">
         <div class="max-w-7xl mx-auto">
 
-            <div class="flex items-center justify-between mb-7">
+            <!-- Page Heading -->
+            <div class="flex items-center justify-between gap-4 mb-7">
+
                 <div>
-                    <div class="text-xs text-slate-400 uppercase tracking-widest">
+                    <div class="text-xs text-slate-400 uppercase tracking-widest mb-1">
                         TutorLink
                     </div>
 
@@ -87,23 +155,66 @@
                     </h1>
                 </div>
 
-                <div class="px-4 py-2 bg-white rounded-xl border text-xs font-semibold text-navy">
+                <div class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold text-navy shadow-sm">
                     {{ role_name }}
                 </div>
+
             </div>
 
+            <!-- Messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-5 p-3 rounded-xl bg-white border border-emerald-100 text-sm">
+                    <div class="mb-5 p-3 rounded-xl bg-white border border-emerald-100 text-sm shadow-sm">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
+            <!-- Dashboard Content -->
             {% block content %}{% endblock %}
 
         </div>
     </main>
+
+    <!-- Profile Dropdown Script -->
+    <script>
+        const profileButton = document.getElementById('profileButton');
+        const profileMenu = document.getElementById('profileMenu');
+        const profileArrow = document.getElementById('profileArrow');
+
+        function closeProfileMenu() {
+            profileMenu.classList.add('hidden');
+            profileButton.setAttribute('aria-expanded', 'false');
+            profileArrow.classList.remove('rotate-180');
+        }
+
+        profileButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+
+            const isClosed = profileMenu.classList.contains('hidden');
+
+            if (isClosed) {
+                profileMenu.classList.remove('hidden');
+                profileButton.setAttribute('aria-expanded', 'true');
+                profileArrow.classList.add('rotate-180');
+            } else {
+                closeProfileMenu();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!document.getElementById('profileDropdown').contains(event.target)) {
+                closeProfileMenu();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeProfileMenu();
+                profileButton.focus();
+            }
+        });
+    </script>
 
 </body>
 </html>
