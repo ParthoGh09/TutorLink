@@ -1,0 +1,187 @@
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+
+{% block title %}Applications{% endblock %}
+{% block heading %}Applications{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-5">
+
+    <div class="bg-white border rounded-2xl p-6">
+        <h2 class="text-2xl font-bold">
+            {% if is_tutor %}My Applications & Requests
+            {% else %}Tutor Applications{% endif %}
+        </h2>
+        <p class="text-sm text-slate-500 mt-2">
+            Review requests and track the demo class process.
+        </p>
+    </div>
+
+    {% if is_tutor %}
+        {% for application in my_applications %}
+        <article class="bg-white border rounded-2xl p-6">
+            <div class="flex flex-wrap justify-between gap-3">
+                <div>
+                    <h3 class="text-xl font-bold">
+                        {{ application.tuition.subject }}
+                    </h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Class {{ application.tuition.class_level }}
+                    </p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Student:
+                        {{ application.tuition.student.get_full_name|default:application.tuition.student.username }}
+                    </p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Budget: ৳{{ application.tuition.budget_min }}–৳{{ application.tuition.budget_max }}
+                    </p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Location: {{ application.tuition.area }},
+                        {{ application.tuition.district }}
+                    </p>
+                </div>
+
+                <div class="space-y-2 text-right">
+                    {% if application.tuition.target_tutor_id == request.user.pk %}
+                    <span class="block text-xs rounded-full bg-purple-100 text-purple-700 px-3 py-2">
+                        Personal Request
+                    </span>
+                    {% endif %}
+
+                    <span class="inline-block rounded-full px-3 py-2 text-sm font-semibold
+                        {% if application.status == 'ACCEPTED' %}
+                            bg-emerald-100 text-emerald-700
+                        {% elif application.status == 'REJECTED' %}
+                            bg-red-100 text-red-700
+                        {% else %}
+                            bg-amber-100 text-amber-700
+                        {% endif %}">
+                        {{ application.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-sm text-slate-500 mt-4">
+                Received/applied on {{ application.applied_at|date:"M d, Y" }}
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{% url 'tuitions:post_detail' application.tuition.pk %}"
+                   class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-semibold">
+                    View Tuition
+                </a>
+
+                {% if application.status == 'PENDING' and application.tuition.status == 'OPEN' and application.tuition.target_tutor_id == request.user.pk %}
+                <form method="post"
+                      action="{% url 'tuitions:accept_application' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold">
+                        Accept Request
+                    </button>
+                </form>
+
+                <form method="post"
+                      action="{% url 'tuitions:reject_application' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-red-50 text-red-700 text-sm font-semibold">
+                        Reject Request
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if application.status == 'ACCEPTED' %}
+                <a href="{% url 'tuitions:demo_classes' %}"
+                   class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">
+                    Schedule / View Demo
+                </a>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <div class="bg-white border rounded-2xl p-8 text-center">
+            <p class="font-semibold">You have no applications or personal requests yet.</p>
+            <a href="{% url 'tuitions:post_list' %}"
+               class="inline-block mt-4 px-5 py-3 rounded-xl bg-blue-600 text-white">
+                Find Tuition
+            </a>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        {% for application in received_applications %}
+        <article class="bg-white border rounded-2xl p-6">
+            <div class="flex flex-wrap justify-between gap-3">
+                <div>
+                    <h3 class="text-xl font-bold">
+                        {{ application.tuition.subject }}
+                    </h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Tutor:
+                        {{ application.tutor.get_full_name|default:application.tutor.username }}
+                    </p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Class {{ application.tuition.class_level }}
+                    </p>
+                </div>
+
+                <span class="h-fit rounded-full px-3 py-2 text-sm font-semibold
+                    {% if application.status == 'ACCEPTED' %}
+                        bg-emerald-100 text-emerald-700
+                    {% elif application.status == 'REJECTED' %}
+                        bg-red-100 text-red-700
+                    {% else %}
+                        bg-amber-100 text-amber-700
+                    {% endif %}">
+                    {{ application.get_status_display }}
+                </span>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{% url 'tuitions:post_detail' application.tuition.pk %}"
+                   class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-semibold">
+                    View Tuition
+                </a>
+
+                {% if application.tuition.target_tutor_id == application.tutor_id %}
+                    {% if application.status == 'PENDING' %}
+                    <p class="w-full text-sm text-purple-700">
+                        Waiting for your selected tutor to accept or reject the request.
+                    </p>
+                    {% endif %}
+                {% elif application.status == 'PENDING' and application.tuition.status == 'OPEN' %}
+                <form method="post"
+                      action="{% url 'tuitions:accept_application' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold">
+                        Accept Tutor
+                    </button>
+                </form>
+
+                <form method="post"
+                      action="{% url 'tuitions:reject_application' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-red-50 text-red-700 text-sm font-semibold">
+                        Reject
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if application.status == 'ACCEPTED' %}
+                <a href="{% url 'tuitions:demo_classes' %}"
+                   class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">
+                    Demo Classes
+                </a>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <div class="bg-white border rounded-2xl p-8 text-center">
+            <p class="font-semibold">No applications received yet.</p>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

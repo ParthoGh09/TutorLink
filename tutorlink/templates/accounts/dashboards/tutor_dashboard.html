@@ -1,21 +1,65 @@
 {% extends 'accounts/dashboards/base_dashboard.html' %}
+
 {% block title %}Tutor Dashboard{% endblock %}
-{% block heading %}Tutor Home{% endblock %}
+{% block heading %}Tutor Dashboard{% endblock %}
+
 {% block nav %}
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Find Tuition</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">My Applications</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Demo Classes</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">Messages</a>
-<a href="#" class="block px-3 py-2.5 rounded-xl hover:bg-white/10">My Profile</a>
+<a href="{% url 'tuitions:post_list' %}"
+   class="px-3 py-2 rounded-lg hover:bg-white/10">
+    Find Tuition
+</a>
+<a href="{% url 'tuitions:applications' %}"
+   class="px-3 py-2 rounded-lg hover:bg-white/10">
+    My Applications
+</a>
+<a href="{% url 'tuitions:demo_classes' %}"
+   class="px-3 py-2 rounded-lg hover:bg-white/10">
+    Demo Classes
+</a>
 {% endblock %}
+
 {% block content %}
-<div class="bg-white border rounded-3xl p-7 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-    <div><span class="inline-flex px-3 py-1 rounded-full bg-mint text-success text-xs font-bold">TUTOR ACCOUNT</span><h2 class="text-3xl font-bold font-serif text-navy mt-3">Find tuition opportunities.</h2><p class="text-sm text-slate-500 mt-2 max-w-2xl">Browse open tuition posts, review match percentages and apply to suitable students.</p></div>
-    <a href="#" class="px-5 py-3 rounded-xl bg-navy text-white text-sm font-semibold">Find Tuition</a>
-</div>
-<div class="grid sm:grid-cols-3 gap-4 mb-6">
-<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Profile</p><p class="text-2xl font-bold text-navy mt-2">{{ user.get_full_name|default:user.username }}</p><p class="text-xs text-slate-500 mt-1">Keep education and availability updated.</p></div>
-<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Verification</p><p class="text-2xl font-bold text-navy mt-2">{% if user.is_verified %}Verified{% else %}Pending{% endif %}</p><p class="text-xs text-slate-500 mt-1">Admin verification status.</p></div>
-<div class="bg-white rounded-2xl border p-5"><p class="text-xs text-slate-400 uppercase">Mode</p><p class="text-2xl font-bold text-navy mt-2">Online-first</p><p class="text-xs text-slate-500 mt-1">Demo before offline tuition.</p></div>
+<div class="space-y-6">
+
+    <section class="bg-white border rounded-2xl p-7">
+        <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+            TUTOR ACCOUNT
+        </span>
+        <h2 class="text-3xl font-bold mt-3">
+            Welcome, {{ user.get_full_name|default:user.username }}!
+        </h2>
+        <p class="text-slate-500 mt-2">
+            Search tuition posts, apply to public opportunities, or accept
+            personal requests sent directly to you.
+        </p>
+        <a href="{% url 'tuitions:post_list' %}"
+           class="inline-block mt-5 px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold">
+            Find Tuition
+        </a>
+    </section>
+
+    <div class="grid sm:grid-cols-2 gap-5">
+        <a href="{% url 'tuitions:applications' %}"
+           class="bg-white rounded-2xl border p-6 hover:shadow-md">
+            <h3 class="font-bold text-lg">Applications & Requests</h3>
+            <p class="text-sm text-slate-500 mt-2">
+                Check your public applications and personal tutor requests.
+            </p>
+            <span class="inline-block mt-4 text-blue-700 font-semibold">
+                Open Applications →
+            </span>
+        </a>
+
+        <a href="{% url 'tuitions:demo_classes' %}"
+           class="bg-white rounded-2xl border p-6 hover:shadow-md">
+            <h3 class="font-bold text-lg">Demo Classes</h3>
+            <p class="text-sm text-slate-500 mt-2">
+                Schedule demo dates, times, and meeting links after accepting.
+            </p>
+            <span class="inline-block mt-4 text-blue-700 font-semibold">
+                Open Demo Classes →
+            </span>
+        </a>
+    </div>
 </div>
 {% endblock %}

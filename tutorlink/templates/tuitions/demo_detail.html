@@ -1,0 +1,112 @@
+
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+
+{% block title %}Demo Details{% endblock %}
+{% block heading %}Demo Details{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto bg-white border border-slate-200 rounded-2xl p-6 md:p-8">
+
+    {% if demo %}
+
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="text-sm text-blue-600 font-semibold">TUTORLINK</p>
+
+                <h2 class="text-2xl font-bold text-slate-800 mt-2">
+                    {{ application.tuition.subject }}
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Class {{ application.tuition.class_level }}
+                </p>
+            </div>
+
+            <span class="px-3 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
+                {{ demo.get_status_display }}
+            </span>
+        </div>
+
+        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+
+            <div class="rounded-xl bg-slate-50 border p-4">
+                <p class="text-sm text-slate-500">Student</p>
+                <p class="font-semibold mt-1">
+                    {{ application.tuition.student.get_full_name|default:application.tuition.student.username }}
+                </p>
+            </div>
+
+            <div class="rounded-xl bg-slate-50 border p-4">
+                <p class="text-sm text-slate-500">Tutor</p>
+                <p class="font-semibold mt-1">
+                    {{ application.tutor.get_full_name|default:application.tutor.username }}
+                </p>
+            </div>
+
+            <div class="rounded-xl bg-slate-50 border p-4">
+                <p class="text-sm text-slate-500">Demo Date</p>
+                <p class="font-semibold mt-1">
+                    {{ demo.date|date:"M d, Y" }}
+                </p>
+            </div>
+
+            <div class="rounded-xl bg-slate-50 border p-4">
+                <p class="text-sm text-slate-500">Demo Time</p>
+                <p class="font-semibold mt-1">
+                    {{ demo.time|time:"g:i A" }}
+                </p>
+            </div>
+
+        </div>
+
+        <div class="mt-6 rounded-xl border p-5">
+            <p class="text-sm text-slate-500">Online Platform</p>
+
+            <p class="font-semibold mt-1">
+                {{ demo.get_platform_display }}
+            </p>
+
+            <p class="text-sm text-slate-500 mt-4">Meeting Link</p>
+
+            <a href="{{ demo.meeting_link }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="block mt-2 text-blue-600 underline break-all">
+                {{ demo.meeting_link }}
+            </a>
+
+            <a href="{{ demo.meeting_link }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-block mt-5 px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
+                Join Online Demo
+            </a>
+        </div>
+
+        {% if is_tutor %}
+            <p class="mt-5 text-sm text-emerald-700">
+                Your demo details have been saved. The student can now see the same meeting link.
+            </p>
+        {% endif %}
+
+    {% else %}
+
+        <h2 class="text-xl font-bold text-slate-800">
+            Demo not scheduled
+        </h2>
+
+        <p class="text-slate-500 mt-2">
+            No demo details have been saved for this accepted tuition yet.
+        </p>
+
+    {% endif %}
+
+    <a href="{% url 'tuitions:demo_classes' %}"
+       class="inline-block mt-6 px-5 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold">
+        Back to Demo Classes
+    </a>
+
+</div>
+
+{% endblock %}

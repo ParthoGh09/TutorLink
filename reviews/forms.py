@@ -29,3 +29,5 @@ class ReviewForm(forms.ModelForm):
                 'class': 'form-checkbox'
             })
         }
+
+

@@ -1,0 +1,238 @@
+
+{% extends 'accounts/dashboards/base_dashboard.html' %}
+
+{% block title %}Demo Classes{% endblock %}
+{% block heading %}Demo Classes{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-5">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-4 rounded-xl bg-blue-50 text-blue-800">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% for item in demo_items %}
+        {% with application=item.application demo=item.demo %}
+        <div class="bg-white border rounded-2xl p-6 space-y-5">
+
+            <div class="flex flex-wrap justify-between gap-3">
+                <div>
+                    <h2 class="text-xl font-bold">
+                        {{ application.tuition.subject }}
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        Class {{ application.tuition.class_level }}
+                    </p>
+
+                    {% if is_student %}
+                        <p class="mt-2">
+                            Tutor:
+                            {{ application.tutor.get_full_name|default:application.tutor.username }}
+                        </p>
+                    {% elif is_tutor %}
+                        <p class="mt-2">
+                            Student:
+                            {{ application.tuition.student.get_full_name|default:application.tuition.student.username }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <span class="px-3 py-2 rounded-full bg-gray-100 text-sm h-fit">
+                    {% if demo %}
+                        {{ demo.get_status_display }}
+                    {% else %}
+                        Not scheduled
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if demo %}
+                <div class="p-4 rounded-xl bg-gray-50 space-y-2">
+                    <p><strong>Date:</strong> {{ demo.date|date:"M d, Y" }}</p>
+                    <p><strong>Time:</strong> {{ demo.time|time:"g:i A" }}</p>
+                    <p><strong>Platform:</strong> {{ demo.get_platform_display }}</p>
+
+                    {% if demo.meeting_link and demo.status == 'SCHEDULED' %}
+                        <a href="{{ demo.meeting_link }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-block mt-2 px-4 py-2 rounded-lg bg-blue-600 text-white">
+                            Join Online Demo
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if is_tutor and application.tuition.status == 'FILLED' %}
+                {% if not demo or demo.status != 'COMPLETED' %}
+                    <form method="post"
+                          action="{% url 'tuitions:schedule_demo' application.pk %}"
+                          class="border-t pt-5 space-y-4">
+                        {% csrf_token %}
+
+                        <h3 class="font-bold">
+                            {% if demo %}Update Demo{% else %}Schedule Demo{% endif %}
+                        </h3>
+
+                        <div>
+                            <label class="block mb-1">Demo Date</label>
+                            <input type="date" name="date"
+                                   value="{% if demo %}{{ demo.date|date:'Y-m-d' }}{% endif %}"
+                                   required class="w-full border rounded-lg p-3">
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">Demo Time</label>
+                            <input type="time" name="time"
+                                   value="{% if demo %}{{ demo.time|time:'H:i' }}{% endif %}"
+                                   required class="w-full border rounded-lg p-3">
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">Platform</label>
+                            <select name="platform" required
+                                    class="w-full border rounded-lg p-3">
+                                <option value="MEET"
+                                    {% if demo and demo.platform == 'MEET' %}selected{% endif %}>
+                                    Google Meet
+                                </option>
+                                <option value="ZOOM"
+                                    {% if demo and demo.platform == 'ZOOM' %}selected{% endif %}>
+                                    Zoom
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">Meeting Link</label>
+                            <input type="url" name="meeting_link"
+                                   value="{% if demo %}{{ demo.meeting_link }}{% endif %}"
+                                   placeholder="https://meet.google.com/..."
+                                   required class="w-full border rounded-lg p-3">
+                        </div>
+
+                        <button type="submit"
+                                class="px-5 py-3 rounded-lg bg-blue-600 text-white">
+                            Save Demo Details
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            {% if is_student and demo and demo.status == 'SCHEDULED' %}
+                <form method="post"
+                      action="{% url 'tuitions:complete_demo' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-5 py-3 rounded-lg bg-emerald-600 text-white">
+                        Mark Demo Completed
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if is_student and demo and demo.status == 'COMPLETED' and application.tuition.status == 'FILLED' %}
+                <div class="border-t pt-5 space-y-4">
+                    <h3 class="font-bold text-lg">
+                        Do you want to keep this tutor?
+                    </h3>
+
+                    <p class="text-sm text-gray-600">
+                        Confirming completes the tuition. Declining reopens
+                        the post so other tutors can apply.
+                    </p>
+
+                    <div class="flex flex-wrap gap-3">
+                        <form method="post"
+                              action="{% url 'tuitions:confirm_tutor' application.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="px-5 py-3 rounded-lg bg-emerald-600 text-white">
+                                Confirm & Complete Tuition
+                            </button>
+                        </form>
+
+                        <form method="post"
+                              action="{% url 'tuitions:decline_tutor' application.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="px-5 py-3 rounded-lg bg-red-600 text-white">
+                                No, Find Another Tutor
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if is_student and demo and demo.status == 'COMPLETED' and application.tuition.status == 'COMPLETED' %}
+                <div class="border-t pt-5">
+                    {% if not application.reviewed_at %}
+                        <h3 class="font-bold text-lg mb-3">
+                            Rate This Tutor
+                        </h3>
+
+                        <form method="post"
+                              action="{% url 'tuitions:submit_review' application.pk %}"
+                              class="space-y-4">
+                            {% csrf_token %}
+
+                            <div>
+                                <label class="block mb-1">Rating</label>
+                                <select name="review_rating" required
+                                        class="w-full border rounded-lg p-3">
+                                    <option value="">Choose a rating</option>
+                                    <option value="1">1 - Poor</option>
+                                    <option value="2">2 - Fair</option>
+                                    <option value="3">3 - Good</option>
+                                    <option value="4">4 - Very Good</option>
+                                    <option value="5">5 - Excellent</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block mb-1">Review (Optional)</label>
+                                <textarea name="review_text" rows="3"
+                                          class="w-full border rounded-lg p-3"
+                                          placeholder="Share your experience"></textarea>
+                            </div>
+
+                            <button type="submit"
+                                    class="px-5 py-3 rounded-lg bg-blue-600 text-white">
+                                Submit Review
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="text-emerald-700">
+                            You rated this tutor {{ application.review_rating }}/5.
+                        </p>
+                        <p>{{ application.review_text }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if application.tuition.status == 'COMPLETED' %}
+                <p class="text-sm text-emerald-700 font-semibold">
+                    Tuition Completed
+                </p>
+            {% endif %}
+
+        </div>
+        {% endwith %}
+    {% empty %}
+        <div class="bg-white border rounded-2xl p-8 text-center">
+            <h3 class="font-bold">No Demo Classes Yet</h3>
+            <p class="text-sm text-gray-500 mt-2">
+                Accepted tuition applications will appear here.
+            </p>
+            <a href="{% url 'tuitions:applications' %}"
+               class="inline-block mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white">
+                View Applications
+            </a>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

@@ -1,10 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>{% block title %}Dashboard{% endblock %} | TutorLink</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,48 +12,108 @@
             theme: {
                 extend: {
                     colors: {
-                        navy: '#2563EB',
-                        indigoCustom: '#3B82F6',
+                        navy: '#1D4ED8',
+                        indigoCustom: '#4F46E5',
                         coral: '#EF4444',
                         mint: '#E7F8F1',
                         sunshine: '#DBEAFE',
-                        success: '#12A783'
+                        success: '#059669'
                     }
                 }
             }
-        }
+        };
     </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #eff6ff, #f5f3ff, #eef2ff);
+            min-height: 100vh;
+        }
+
+        .gradient-card {
+            background: linear-gradient(135deg, #ffffff, #eff6ff, #f5f3ff);
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(37, 99, 235, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .gradient-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(79, 70, 229, 0.14);
+        }
+
+        .gradient-button {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+            transition: .2s ease;
+        }
+
+        .gradient-button:hover {
+            background: linear-gradient(135deg, #1d4ed8, #4338ca);
+            transform: translateY(-1px);
+        }
+
+        .gradient-heading {
+            background: linear-gradient(90deg, #1d4ed8, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        #profileMenu {
+            animation: menuAppear .15s ease-out;
+        }
+
+        @keyframes menuAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        select,
+        textarea {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #3b82f6;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-100 min-h-screen text-slate-800">
+<body class="min-h-screen text-slate-800">
 
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950 text-white shadow-lg">
+    <nav class="bg-gradient-to-r from-blue-950 via-indigo-950 to-violet-950 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-5">
-
-            <div class="flex items-center justify-between gap-4 min-h-[76px]">
+            <div class="flex flex-wrap items-center justify-between gap-4 min-h-[76px]">
 
                 <!-- Logo -->
                 <a href="{% url 'role_dashboard' %}"
-                   class="flex items-center gap-2 shrink-0">
-
-                    <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl">
+                   class="flex items-center gap-3 shrink-0">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-2xl shadow">
                         🎓
                     </div>
 
                     <div>
-                        <div class="font-bold text-lg font-serif tracking-wide">
-                            TutorLink
-                        </div>
-                        <div class="text-[9px] text-blue-200">
+                        <div class="font-bold text-xl tracking-wide">TutorLink</div>
+                        <div class="text-[10px] text-blue-200">
                             Connect • Learn • Earn • Safety
                         </div>
                     </div>
                 </a>
 
-                <!-- Navigation Links: One Line -->
-                <div class="flex items-center gap-1 text-sm font-medium whitespace-nowrap">
-
+                <!-- Navigation -->
+                <div class="flex flex-wrap items-center gap-1 text-sm font-medium">
                     <a href="{% url 'role_dashboard' %}"
                        class="px-3 py-2 rounded-lg hover:bg-white/10 transition">
                         Dashboard
@@ -63,74 +121,84 @@
 
                     <a href="{% url 'tuitions:post_list' %}"
                        class="px-3 py-2 rounded-lg hover:bg-white/10 transition">
-                        View Tuition Posts
+                        Tuition Posts
                     </a>
 
                     {% block nav %}{% endblock %}
-
                 </div>
 
                 <!-- Profile Dropdown -->
                 <div class="relative shrink-0" id="profileDropdown">
 
-                    <button
-                        type="button"
-                        id="profileButton"
-                        aria-expanded="false"
-                        aria-controls="profileMenu"
-                        class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+                    <button type="button"
+                            id="profileButton"
+                            aria-expanded="false"
+                            aria-controls="profileMenu"
+                            class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/10 transition">
 
-                        <div class="w-8 h-8 rounded-full bg-blue-400/20 border border-white/20 flex items-center justify-center font-semibold text-sm">
-                            {{ user.username|first|upper }}
-                        </div>
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}"
+                                 alt="Profile picture"
+                                 class="w-9 h-9 rounded-full object-cover border-2 border-white/40">
+                        {% else %}
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center font-bold">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
 
                         <span class="text-sm font-medium max-w-[150px] truncate">
                             {{ user.get_full_name|default:user.username }}
                         </span>
 
-                        <svg id="profileArrow"
-                             class="w-4 h-4 transition-transform duration-200"
-                             xmlns="http://www.w3.org/2000/svg"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="m19 9-7 7-7-7"/>
-                        </svg>
+                        <span id="profileArrow" aria-hidden="true">⌄</span>
                     </button>
 
-                    <!-- Dropdown Menu -->
+                    <!-- Dropdown Items -->
                     <div id="profileMenu"
-                         class="hidden absolute right-0 top-full mt-2 w-52 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                         class="hidden absolute right-0 top-full mt-2 w-60 bg-white text-slate-800 rounded-2xl shadow-2xl border border-blue-100 py-2 z-50">
 
                         <div class="px-4 py-3 border-b border-slate-100">
-                            <p class="text-xs text-slate-500">
-                                Signed in as
-                            </p>
+                            <p class="text-xs text-slate-500">Signed in as</p>
                             <p class="text-sm font-semibold truncate">
                                 {{ user.get_full_name|default:user.username }}
                             </p>
+                            <p class="text-xs text-blue-600 mt-1">
+                                {% if user.is_superuser %}
+                                    Administrator
+                                {% else %}
+                                    {{ user.get_role_display }}
+                                {% endif %}
+                            </p>
                         </div>
 
-                        <a href="{% url 'logout' %}"
-                           class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition">
-
-                            <svg class="w-5 h-5"
-                                 xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M18 15l3-3m0 0-3-3m3 3H9"/>
-                            </svg>
-
-                            <span class="font-medium">Log out</span>
+                        <a href="{% url 'profile' %}"
+                           class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition">
+                            <span>👤</span>
+                            <span>My Profile</span>
                         </a>
 
+                        <a href="{% url 'edit_profile' %}"
+                           class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition">
+                            <span>✏️</span>
+                            <span>Edit Profile</span>
+                        </a>
+
+                        <a href="{% url 'verify_identity' %}"
+                           class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition">
+                            <span>🛡️</span>
+                            <span>Verify Identity</span>
+                        </a>
+
+                        <div class="border-t border-slate-100 my-1"></div>
+
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="w-full flex items-center gap-3 text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition">
+                                <span>🚪</span>
+                                <span>Log out</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
 
@@ -138,83 +206,94 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="p-5 md:p-8">
         <div class="max-w-7xl mx-auto">
 
-            <!-- Page Heading -->
-            <div class="flex items-center justify-between gap-4 mb-7">
-
+            <!-- Page heading -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-7">
                 <div>
-                    <div class="text-xs text-slate-400 uppercase tracking-widest mb-1">
+                    <div class="text-xs text-blue-500 uppercase tracking-widest mb-1">
                         TutorLink
                     </div>
 
-                    <h1 class="text-3xl font-bold font-serif text-navy">
+                    <h1 class="text-3xl font-bold gradient-heading">
                         {% block heading %}Dashboard{% endblock %}
                     </h1>
                 </div>
 
-                <div class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold text-navy shadow-sm">
+                <div class="px-4 py-2 bg-gradient-to-r from-blue-100 to-violet-100 rounded-xl border border-blue-200 text-xs font-bold text-blue-800">
                     {{ role_name }}
                 </div>
-
             </div>
 
             <!-- Messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-5 p-3 rounded-xl bg-white border border-emerald-100 text-sm shadow-sm">
+                    <div class="mb-5 p-4 rounded-xl bg-gradient-to-r from-white to-blue-50 border border-blue-100 text-sm shadow-sm">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
-            <!-- Dashboard Content -->
             {% block content %}{% endblock %}
 
         </div>
     </main>
 
-    <!-- Profile Dropdown Script -->
     <script>
-        const profileButton = document.getElementById('profileButton');
-        const profileMenu = document.getElementById('profileMenu');
-        const profileArrow = document.getElementById('profileArrow');
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileButton = document.getElementById("profileButton");
+            const profileMenu = document.getElementById("profileMenu");
+            const profileDropdown = document.getElementById("profileDropdown");
+            const profileArrow = document.getElementById("profileArrow");
 
-        function closeProfileMenu() {
-            profileMenu.classList.add('hidden');
-            profileButton.setAttribute('aria-expanded', 'false');
-            profileArrow.classList.remove('rotate-180');
-        }
-
-        profileButton.addEventListener('click', function (event) {
-            event.stopPropagation();
-
-            const isClosed = profileMenu.classList.contains('hidden');
-
-            if (isClosed) {
-                profileMenu.classList.remove('hidden');
-                profileButton.setAttribute('aria-expanded', 'true');
-                profileArrow.classList.add('rotate-180');
-            } else {
-                closeProfileMenu();
+            if (!profileButton || !profileMenu || !profileDropdown) {
+                return;
             }
-        });
 
-        document.addEventListener('click', function (event) {
-            if (!document.getElementById('profileDropdown').contains(event.target)) {
-                closeProfileMenu();
-            }
-        });
+            function closeProfileMenu() {
+                profileMenu.classList.add("hidden");
+                profileButton.setAttribute("aria-expanded", "false");
 
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeProfileMenu();
-                profileButton.focus();
+                if (profileArrow) {
+                    profileArrow.textContent = "⌄";
+                }
             }
+
+            function toggleProfileMenu(event) {
+                event.stopPropagation();
+
+                const isClosed = profileMenu.classList.contains("hidden");
+
+                if (isClosed) {
+                    profileMenu.classList.remove("hidden");
+                    profileButton.setAttribute("aria-expanded", "true");
+
+                    if (profileArrow) {
+                        profileArrow.textContent = "⌃";
+                    }
+                } else {
+                    closeProfileMenu();
+                }
+            }
+
+            profileButton.addEventListener("click", toggleProfileMenu);
+
+            document.addEventListener("click", function (event) {
+                if (!profileDropdown.contains(event.target)) {
+                    closeProfileMenu();
+                }
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeProfileMenu();
+                     profileButton.focus();
+                }
+            });
         });
     </script>
 
 </body>
 </html>
+

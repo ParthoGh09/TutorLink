@@ -6,7 +6,7 @@ from .forms import ReviewForm
 
 
 def get_or_create_default_users():
-    """Ensure default users exist for demonstration matching the design document."""
+
     student, _ = User.objects.get_or_create(
         username='ayesha_rahman',
         defaults={'first_name': 'Ayesha', 'last_name': 'Rahman', 'email': 'ayesha.rahman@gmail.com'}
