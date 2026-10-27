@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
-
 from accounts.models import User
 from tuitions.forms import TuitionPostForm
 from tuitions.models import TuitionPost, TuitionApplication
