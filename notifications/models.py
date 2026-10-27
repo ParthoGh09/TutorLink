@@ -1,20 +1,22 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+
 class NotificationType(models.TextChoices):
-    MATCH = 'MATCH', 'Match'
-    APPLICATION = 'APPLICATION', 'Application'
-    DEMO = 'DEMO', 'Demo'
-    VERIFICATION = 'VERIFICATION', 'Verification'
-    LOCATION = 'LOCATION', 'Location'
-    REVIEW = 'REVIEW', 'Review'
-    SYSTEM = 'SYSTEM', 'System'
+    MATCH = 'MATCH'
+    APPLICATION = 'APPLICATION'
+    DEMO = 'DEMO'
+    VERIFICATION = 'VERIFICATION'
+    LOCATION = 'LOCATION'
+    REVIEW = 'REVIEW'
+    SYSTEM = 'SYSTEM'
 
 
 class Notification(models.Model):
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     notification_type = models.CharField(
         max_length=20,
         choices=NotificationType.choices,
@@ -37,3 +39,36 @@ class Notification(models.Model):
         if not self.is_read:
             self.is_read = True
             self.save(update_fields=['is_read'])
+
+    @property
+    def time_ago(self):
+        """Returns relative time string matching Slide 17 UI (5m, 40m, 2h, Yesterday, Tue, Oct 20)."""
+        now = timezone.now()
+        diff = now - self.created_at
+        seconds = diff.total_seconds()
+        
+        if seconds < 60:
+            return "Just now"
+        elif seconds < 3600:
+            return f"{int(seconds // 60)}m"
+        elif seconds < 86400:
+            return f"{int(seconds // 3600)}h"
+        elif seconds < 172800:
+            return "Yesterday"
+        elif seconds < 604800: # Within 7 days
+            return self.created_at.strftime("%a") # e.g. Mon, Tue
+        else:
+            return self.created_at.strftime("%b %d") # e.g. Oct 20
+
+    @property
+    def icon_symbol(self):
+        icons = {
+            NotificationType.MATCH: "✦",
+            NotificationType.APPLICATION: "👥",
+            NotificationType.DEMO: "📹",
+            NotificationType.VERIFICATION: "🛡️",
+            NotificationType.LOCATION: "🎯",
+            NotificationType.REVIEW: "⭐",
+            NotificationType.SYSTEM: "🔔",
+        }
+        return icons.get(self.notification_type, "🔔")

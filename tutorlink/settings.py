@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "accounts",
     "tutors",
     "tuitions",
+    'notifications.apps.NotificationsConfig',
 ]
 
 MIDDLEWARE = [
