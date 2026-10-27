@@ -4,13 +4,13 @@ from django.utils import timezone
 
 
 class NotificationType(models.TextChoices):
-    MATCH = 'MATCH', 'Match'
-    APPLICATION = 'APPLICATION', 'Application'
-    DEMO = 'DEMO', 'Demo'
-    VERIFICATION = 'VERIFICATION', 'Verification'
-    LOCATION = 'LOCATION', 'Location'
-    REVIEW = 'REVIEW', 'Review'
-    SYSTEM = 'SYSTEM', 'System'
+    MATCH = 'MATCH'
+    APPLICATION = 'APPLICATION'
+    DEMO = 'DEMO'
+    VERIFICATION = 'VERIFICATION'
+    LOCATION = 'LOCATION'
+    REVIEW = 'REVIEW'
+    SYSTEM = 'SYSTEM'
 
 
 class Notification(models.Model):

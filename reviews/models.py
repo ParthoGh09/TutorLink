@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Avg, Count
+from django.db.models import Avg
 
 
 class Review(models.Model):
     class ReviewType(models.TextChoices):
-        STUDENT_TO_TUTOR = 'STUDENT_TO_TUTOR', 'Student to Tutor'
-        TUTOR_TO_STUDENT = 'TUTOR_TO_STUDENT', 'Tutor to Student'
+        STUDENT_TO_TUTOR = 'STUDENT_TO_TUTOR'
+        TUTOR_TO_STUDENT = 'TUTOR_TO_STUDENT'
 
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_given')
     reviewee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_received')
