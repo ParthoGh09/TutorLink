@@ -40,7 +40,7 @@ class Notification(models.Model):
 
     @property
     def time_ago(self):
-        """Returns relative time string matching Slide 17 UI (5m, 40m, 2h, Yesterday, Mon, Oct 20)."""
+        """Returns relative time string matching Slide 17 UI (5m, 40m, 2h, Yesterday, Tue, Oct 20)."""
         now = timezone.now()
         diff = now - self.created_at
         seconds = diff.total_seconds()

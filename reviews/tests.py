@@ -44,8 +44,8 @@ class ReviewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         
         # Verify saved in DB
-        review = Review.objects.filter(reviewee=self.tutor).first()
-        self.assertIsNotNone(review)
+        review = Review.objects.get(reviewee=self.tutor)
+        assert review is not None
         self.assertEqual(review.overall_rating, 5)
         self.assertEqual(review.subject_knowledge, 5)
         self.assertTrue(review.post_as_verified)
