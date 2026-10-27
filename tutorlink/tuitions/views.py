@@ -1,3 +1,4 @@
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -28,10 +29,48 @@ def is_tutor(user):
 
 
 def _demo_for_application(application):
-    return DemoClass.objects.filter(
-        student_id=application.tuition.student_id,
-        tutor__user_id=application.tutor_id,
-    ).select_related("tutor", "subject").first()
+    """
+    Return the demo belonging to this exact application.
+
+    New demos use the application OneToOneField.
+    Legacy demos without an application link are returned only
+    when the student-tutor match is unambiguous.
+    """
+    demo = (
+        DemoClass.objects.filter(application=application)
+        .select_related("tutor", "subject")
+        .first()
+    )
+
+    if demo:
+        return demo
+
+    legacy_demos = list(
+        DemoClass.objects.filter(
+            student_id=application.tuition.student_id,
+            tutor__user_id=application.tutor_id,
+            application__isnull=True,
+        )
+        .select_related("tutor", "subject")[:2]
+    )
+
+    if len(legacy_demos) != 1:
+        return None
+
+    other_accepted_application = (
+        TuitionApplication.objects.filter(
+            tuition__student_id=application.tuition.student_id,
+            tutor_id=application.tutor_id,
+            status=TuitionApplication.Status.ACCEPTED,
+        )
+        .exclude(pk=application.pk)
+        .exists()
+    )
+
+    if other_accepted_application:
+        return None
+
+    return legacy_demos[0]
 
 
 @login_required
@@ -40,14 +79,15 @@ def post_list(request):
     applications_by_tuition = {}
 
     if is_tutor(request.user):
-        posts = TuitionPost.objects.filter(
-            status="OPEN"
-        ).filter(
-            Q(target_tutor__isnull=True)
-            | Q(target_tutor=request.user)
-        ).select_related(
-            "student", "target_tutor"
-        ).order_by("-created_at")
+        posts = (
+            TuitionPost.objects.filter(status="OPEN")
+            .filter(
+                Q(target_tutor__isnull=True)
+                | Q(target_tutor=request.user)
+            )
+            .select_related("student", "target_tutor")
+            .order_by("-created_at")
+        )
 
         tutor_applications = TuitionApplication.objects.filter(
             tutor=request.user
@@ -86,21 +126,21 @@ def post_list(request):
         if mode in ("ONLINE", "OFFLINE"):
             posts = posts.filter(teaching_mode=mode)
 
-        # Attach the tutor's complete application to each post.
         for post in posts:
             post.my_application = applications_by_tuition.get(post.pk)
 
     elif is_student(request.user):
-        posts = TuitionPost.objects.filter(
-            student=request.user
-        ).select_related(
-            "student", "target_tutor"
-        ).order_by("-created_at")
+        posts = (
+            TuitionPost.objects.filter(student=request.user)
+            .select_related("student", "target_tutor")
+            .order_by("-created_at")
+        )
 
     elif is_admin(request.user):
-        posts = TuitionPost.objects.select_related(
-            "student", "target_tutor"
-        ).order_by("-created_at")
+        posts = (
+            TuitionPost.objects.select_related("student", "target_tutor")
+            .order_by("-created_at")
+        )
 
     else:
         raise PermissionDenied
@@ -119,9 +159,7 @@ def post_list(request):
 @login_required
 def post_detail(request, pk):
     post = get_object_or_404(
-        TuitionPost.objects.select_related(
-            "student", "target_tutor"
-        ),
+        TuitionPost.objects.select_related("student", "target_tutor"),
         pk=pk,
     )
 
@@ -265,7 +303,6 @@ def apply_for_tuition(request, pk):
     ):
         raise PermissionDenied
 
-    # A personal request already has an application for its selected tutor.
     if post.target_tutor_id == request.user.pk:
         messages.info(
             request,
@@ -292,7 +329,10 @@ def apply_for_tuition(request, pk):
         application.review_text = ""
         application.reviewed_at = None
         application.save(update_fields=[
-            "status", "review_rating", "review_text", "reviewed_at"
+            "status",
+            "review_rating",
+            "review_text",
+            "reviewed_at",
         ])
         messages.success(request, "Your application was submitted again.")
 
@@ -345,7 +385,6 @@ def accept_application(request, application_id):
         pk=application_id,
     )
     post = application.tuition
-
     personal_request = post.target_tutor_id is not None
 
     if personal_request:
@@ -410,7 +449,6 @@ def reject_application(request, application_id):
         pk=application_id,
     )
     post = application.tuition
-
     personal_request = post.target_tutor_id is not None
 
     if personal_request:
@@ -490,13 +528,23 @@ def schedule_demo(request, application_id):
         raise PermissionDenied
 
     application = get_object_or_404(
-        TuitionApplication.objects.select_related("tuition"),
+        TuitionApplication.objects.select_related(
+            "tuition", "tuition__student"
+        ),
         pk=application_id,
         tutor=request.user,
         status=TuitionApplication.Status.ACCEPTED,
     )
 
+    if application.tuition.status != "FILLED":
+        messages.error(
+            request,
+            "This tuition is no longer available for demo scheduling.",
+        )
+        return redirect("tuitions:demo_classes")
+
     form = DemoScheduleForm(request.POST)
+
     if not form.is_valid():
         messages.error(
             request,
@@ -504,12 +552,16 @@ def schedule_demo(request, application_id):
         )
         return redirect("tuitions:demo_classes")
 
-    tutor_profile = TutorProfile.objects.filter(user=request.user).first()
+    tutor_profile = TutorProfile.objects.filter(
+        user=request.user
+    ).first()
+
     if tutor_profile is None:
         messages.error(request, "Your tutor profile was not found.")
         return redirect("tuitions:demo_classes")
 
     existing_demo = _demo_for_application(application)
+
     if existing_demo and existing_demo.status == DemoClass.Status.COMPLETED:
         messages.error(request, "This demo has already been completed.")
         return redirect("tuitions:demo_classes")
@@ -519,27 +571,35 @@ def schedule_demo(request, application_id):
     ).first()
 
     values = {
+        "student": application.tuition.student,
+        "tutor": tutor_profile,
+        "subject": subject_obj,
         "date": form.cleaned_data["date"],
         "time": form.cleaned_data["time"],
         "platform": form.cleaned_data["platform"],
         "meeting_link": form.cleaned_data["meeting_link"],
         "status": DemoClass.Status.SCHEDULED,
-        "subject": subject_obj,
     }
 
     if existing_demo:
         for field, value in values.items():
             setattr(existing_demo, field, value)
+
+        if existing_demo.application_id is None:
+            existing_demo.application = application
+
         existing_demo.save()
     else:
         DemoClass.objects.create(
-            student=application.tuition.student,
-            tutor=tutor_profile,
+            application=application,
             **values,
         )
 
     messages.success(request, "Demo scheduled successfully.")
-    return redirect("tuitions:demo_detail", application_id=application.pk)
+    return redirect(
+        "tuitions:demo_detail",
+        application_id=application.pk,
+    )
 
 
 @login_required
@@ -557,6 +617,7 @@ def demo_detail(request, application_id):
         or request.user.pk == application.tuition.student_id
         or is_admin(request.user)
     )
+
     if not allowed:
         raise PermissionDenied
 
@@ -589,17 +650,26 @@ def complete_demo(request, application_id):
         raise PermissionDenied
 
     demo = _demo_for_application(application)
+
     if not demo or not demo.meeting_link:
         messages.error(request, "The tutor has not scheduled the demo yet.")
-    elif demo.status != DemoClass.Status.COMPLETED:
+
+    elif demo.status == DemoClass.Status.SCHEDULED:
         demo.status = DemoClass.Status.COMPLETED
-        demo.save(update_fields=["status"])
+        demo.save(update_fields=["status", "updated_at"])
         messages.success(
             request,
             "Demo completed. Confirm whether you want to keep this tutor.",
         )
-    else:
+
+    elif demo.status == DemoClass.Status.COMPLETED:
         messages.info(request, "This demo is already completed.")
+
+    else:
+        messages.error(
+            request,
+            "Only a scheduled demo can be marked as completed.",
+        )
 
     return redirect("tuitions:demo_classes")
 
@@ -610,28 +680,41 @@ def confirm_tutor(request, application_id):
     if not is_student(request.user):
         raise PermissionDenied
 
-    application = get_object_or_404(
-        TuitionApplication.objects.select_related("tuition"),
-        pk=application_id,
-        tuition__student=request.user,
-        status=TuitionApplication.Status.ACCEPTED,
-    )
-
-    demo = _demo_for_application(application)
-    if not demo or demo.status != DemoClass.Status.COMPLETED:
-        messages.error(request, "Complete the demo before confirming the tutor.")
-        return redirect("tuitions:demo_classes")
-
-    post = application.tuition
-    if post.status == "COMPLETED":
-        messages.info(request, "This tuition is already completed.")
-    else:
-        post.status = "COMPLETED"
-        post.save(update_fields=["status"])
-        messages.success(
-            request,
-            "Tutor confirmed. Tuition completed; you can now submit a review.",
+    with transaction.atomic():
+        application = get_object_or_404(
+            TuitionApplication.objects.select_related("tuition"),
+            pk=application_id,
+            tuition__student=request.user,
+            status=TuitionApplication.Status.ACCEPTED,
         )
+
+        post = TuitionPost.objects.select_for_update().get(
+            pk=application.tuition_id
+        )
+
+        demo = _demo_for_application(application)
+
+        if not demo or demo.status != DemoClass.Status.COMPLETED:
+            messages.error(
+                request,
+                "Complete the demo before confirming the tutor.",
+            )
+            return redirect("tuitions:demo_classes")
+
+        if post.status == "COMPLETED":
+            messages.info(request, "This tuition is already completed.")
+        elif post.status != "FILLED":
+            messages.error(
+                request,
+                "This tuition is no longer awaiting tutor confirmation.",
+            )
+        else:
+            post.status = "COMPLETED"
+            post.save(update_fields=["status"])
+            messages.success(
+                request,
+                "Tutor confirmed. Tuition completed; you can now submit a review.",
+            )
 
     return redirect("tuitions:demo_classes")
 
@@ -650,7 +733,12 @@ def decline_tutor(request, application_id):
             status=TuitionApplication.Status.ACCEPTED,
         )
 
+        post = TuitionPost.objects.select_for_update().get(
+            pk=application.tuition_id
+        )
+
         demo = _demo_for_application(application)
+
         if not demo or demo.status != DemoClass.Status.COMPLETED:
             messages.error(
                 request,
@@ -658,19 +746,30 @@ def decline_tutor(request, application_id):
             )
             return redirect("tuitions:demo_classes")
 
-        post = TuitionPost.objects.select_for_update().get(
-            pk=application.tuition_id
-        )
+        if post.status != "FILLED":
+            messages.error(
+                request,
+                "This tuition is no longer awaiting tutor selection.",
+            )
+            return redirect("tuitions:demo_classes")
+
         application.status = TuitionApplication.Status.REJECTED
         application.save(update_fields=["status"])
 
         post.status = "CLOSED" if post.target_tutor_id else "OPEN"
         post.save(update_fields=["status"])
 
-    messages.success(
-        request,
-        "Tutor declined. You can post a new request if needed.",
-    )
+    if post.target_tutor_id is None:
+        messages.success(
+            request,
+            "Tutor declined. The tuition post is open for other tutors.",
+        )
+    else:
+        messages.success(
+            request,
+            "Tutor declined. This personal tuition request remains closed.",
+        )
+
     return redirect("tuitions:post_list")
 
 
@@ -687,9 +786,20 @@ def submit_review(request, application_id):
         status=TuitionApplication.Status.ACCEPTED,
     )
 
+    if application.tuition.status != "COMPLETED":
+        messages.error(
+            request,
+            "Confirm the tutor and complete the tuition before reviewing.",
+        )
+        return redirect("tuitions:demo_classes")
+
     demo = _demo_for_application(application)
+
     if not demo or demo.status != DemoClass.Status.COMPLETED:
-        messages.error(request, "Complete the demo before submitting a review.")
+        messages.error(
+            request,
+            "Complete the demo before submitting a review.",
+        )
         return redirect("tuitions:demo_classes")
 
     if application.reviewed_at:
@@ -697,6 +807,7 @@ def submit_review(request, application_id):
         return redirect("tuitions:demo_classes")
 
     form = TuitionReviewForm(request.POST, instance=application)
+
     if not form.is_valid():
         messages.error(request, "Please select a rating from 1 to 5.")
         return redirect("tuitions:demo_classes")
@@ -709,16 +820,20 @@ def submit_review(request, application_id):
         TuitionApplication.objects.filter(
             tutor=application.tutor,
             reviewed_at__isnull=False,
-        ).exclude(
-            review_rating__isnull=True
-        ).values_list("review_rating", flat=True)
+        )
+        .exclude(review_rating__isnull=True)
+        .values_list("review_rating", flat=True)
     )
 
-    profile = TutorProfile.objects.filter(user=application.tutor).first()
+    profile = TutorProfile.objects.filter(
+        user=application.tutor
+    ).first()
+
     if profile:
         profile.review_count = len(ratings)
         profile.rating = (
-            round(sum(ratings) / len(ratings), 1) if ratings else 0
+            round(sum(ratings) / len(ratings), 1)
+            if ratings else 0
         )
         profile.save(update_fields=["rating", "review_count"])
 
