@@ -20,7 +20,7 @@ LABELS = dict(Application.STATUS_CHOICES)
 CURRENT_STUDENT = {"name": "Ayesha Rahman", "role": "Student", "initials": "AR"}
 
 
-def home(request):
+def home(_request):
     return redirect("applications")
 
 
@@ -34,6 +34,7 @@ def applications(request):
         {"key": s, "label": LABELS[s], "count": all_apps.filter(status=s).count()}
         for s in STAT_ORDER
     ]
+    first_app = all_apps.first()
     context = {
         "student": CURRENT_STUDENT,
         "apps": apps,
@@ -42,7 +43,7 @@ def applications(request):
         "total": all_apps.count(),
         "demo_today": DemoClass.objects.filter(date=date.today(), status=DemoClass.SCHEDULED).count(),
         "flow": [(s, LABELS[s]) for s in STAT_ORDER[:5]] + [("accepted", "Accepted / Rejected")],
-        "post_title": all_apps.first().post.title if all_apps.exists() else "",
+        "post_title": first_app.post.title if first_app is not None else "",
     }
     return render(request, "tuition/applications.html", context)
 
@@ -106,11 +107,20 @@ def demo_action(request, pk, action):
         demo.schedule_demo(new_date, new_time)
         messages.success(request, "Demo rescheduled.")
     elif action == "cancel":
-        messages.success(request, "Demo cancelled.") if app.cancel() else messages.error(request, "This demo cannot be cancelled now.")
+        if app.cancel():
+            messages.success(request, "Demo cancelled.")
+        else:
+            messages.error(request, "This demo cannot be cancelled now.")
     elif action == "accept":
-        messages.success(request, f"{app.tutor.name} accepted.") if app.accept() else messages.error(request, "Finish the demo before deciding.")
+        if app.accept():
+            messages.success(request, f"{app.tutor.name} accepted.")
+        else:
+            messages.error(request, "Finish the demo before deciding.")
     elif action == "reject":
-        messages.success(request, f"{app.tutor.name} rejected.") if app.reject() else messages.error(request, "Cannot reject now.")
+        if app.reject():
+            messages.success(request, f"{app.tutor.name} rejected.")
+        else:
+            messages.error(request, "Cannot reject now.")
     elif action == "dev_confirm" and settings.DEBUG:
         # Stand-in for the tutor side (not built yet): tutor confirms the time.
         demo.schedule_demo(demo.date, demo.time)
