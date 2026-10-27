@@ -5,8 +5,8 @@
 
 {% block content %}
 <div class="page-container">
-    <!-- Back to History button (Pure HTML link) -->
-    <a href="{% url 'reviews:review_history' %}" class="btn-back-link">
+    <!-- Back to History button -->
+    <a href="/reviews/history/" class="btn-back-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
@@ -40,19 +40,19 @@
                 <div class="overall-rating-card">
                     <span class="rating-sublabel">Overall rating</span>
                     <div class="star-rating-group">
-                        <input type="radio" id="ov5" name="overall_rating" value="5" {% if form.overall_rating.value == 5 or not form.overall_rating.value %}checked{% endif %}>
+                        <input type="radio" id="ov5" name="overall_rating" value="5" checked>
                         <label for="ov5" title="5 - Excellent">★</label>
 
-                        <input type="radio" id="ov4" name="overall_rating" value="4" {% if form.overall_rating.value == 4 %}checked{% endif %}>
+                        <input type="radio" id="ov4" name="overall_rating" value="4">
                         <label for="ov4" title="4 - Very Good">★</label>
 
-                        <input type="radio" id="ov3" name="overall_rating" value="3" {% if form.overall_rating.value == 3 %}checked{% endif %}>
+                        <input type="radio" id="ov3" name="overall_rating" value="3">
                         <label for="ov3" title="3 - Good">★</label>
 
-                        <input type="radio" id="ov2" name="overall_rating" value="2" {% if form.overall_rating.value == 2 %}checked{% endif %}>
+                        <input type="radio" id="ov2" name="overall_rating" value="2">
                         <label for="ov2" title="2 - Fair">★</label>
 
-                        <input type="radio" id="ov1" name="overall_rating" value="1" {% if form.overall_rating.value == 1 %}checked{% endif %}>
+                        <input type="radio" id="ov1" name="overall_rating" value="1">
                         <label for="ov1" title="1 - Poor">★</label>
                     </div>
                     <div class="overall-score-display">5 · Excellent</div>
@@ -64,15 +64,15 @@
                     <div class="criterion-item">
                         <span class="criterion-label">Subject knowledge</span>
                         <div class="crit-stars-group">
-                            <input type="radio" id="sk5" name="subject_knowledge" value="5" {% if form.subject_knowledge.value == 5 or not form.subject_knowledge.value %}checked{% endif %}>
+                            <input type="radio" id="sk5" name="subject_knowledge" value="5" checked>
                             <label for="sk5" title="5">★</label>
-                            <input type="radio" id="sk4" name="subject_knowledge" value="4" {% if form.subject_knowledge.value == 4 %}checked{% endif %}>
+                            <input type="radio" id="sk4" name="subject_knowledge" value="4">
                             <label for="sk4" title="4">★</label>
-                            <input type="radio" id="sk3" name="subject_knowledge" value="3" {% if form.subject_knowledge.value == 3 %}checked{% endif %}>
+                            <input type="radio" id="sk3" name="subject_knowledge" value="3">
                             <label for="sk3" title="3">★</label>
-                            <input type="radio" id="sk2" name="subject_knowledge" value="2" {% if form.subject_knowledge.value == 2 %}checked{% endif %}>
+                            <input type="radio" id="sk2" name="subject_knowledge" value="2">
                             <label for="sk2" title="2">★</label>
-                            <input type="radio" id="sk1" name="subject_knowledge" value="1" {% if form.subject_knowledge.value == 1 %}checked{% endif %}>
+                            <input type="radio" id="sk1" name="subject_knowledge" value="1">
                             <label for="sk1" title="1">★</label>
                         </div>
                     </div>
@@ -81,15 +81,15 @@
                     <div class="criterion-item">
                         <span class="criterion-label">Communication</span>
                         <div class="crit-stars-group">
-                            <input type="radio" id="cm5" name="communication" value="5" {% if form.communication.value == 5 or not form.communication.value %}checked{% endif %}>
+                            <input type="radio" id="cm5" name="communication" value="5" checked>
                             <label for="cm5" title="5">★</label>
-                            <input type="radio" id="cm4" name="communication" value="4" {% if form.communication.value == 4 %}checked{% endif %}>
+                            <input type="radio" id="cm4" name="communication" value="4">
                             <label for="cm4" title="4">★</label>
-                            <input type="radio" id="cm3" name="communication" value="3" {% if form.communication.value == 3 %}checked{% endif %}>
+                            <input type="radio" id="cm3" name="communication" value="3">
                             <label for="cm3" title="3">★</label>
-                            <input type="radio" id="cm2" name="communication" value="2" {% if form.communication.value == 2 %}checked{% endif %}>
+                            <input type="radio" id="cm2" name="communication" value="2">
                             <label for="cm2" title="2">★</label>
-                            <input type="radio" id="cm1" name="communication" value="1" {% if form.communication.value == 1 %}checked{% endif %}>
+                            <input type="radio" id="cm1" name="communication" value="1">
                             <label for="cm1" title="1">★</label>
                         </div>
                     </div>
@@ -98,15 +98,15 @@
                     <div class="criterion-item">
                         <span class="criterion-label">Punctuality</span>
                         <div class="crit-stars-group">
-                            <input type="radio" id="pu5" name="punctuality" value="5" {% if form.punctuality.value == 5 %}checked{% endif %}>
+                            <input type="radio" id="pu5" name="punctuality" value="5">
                             <label for="pu5" title="5">★</label>
-                            <input type="radio" id="pu4" name="punctuality" value="4" {% if form.punctuality.value == 4 or not form.punctuality.value %}checked{% endif %}>
+                            <input type="radio" id="pu4" name="punctuality" value="4" checked>
                             <label for="pu4" title="4">★</label>
-                            <input type="radio" id="pu3" name="punctuality" value="3" {% if form.punctuality.value == 3 %}checked{% endif %}>
+                            <input type="radio" id="pu3" name="punctuality" value="3">
                             <label for="pu3" title="3">★</label>
-                            <input type="radio" id="pu2" name="punctuality" value="2" {% if form.punctuality.value == 2 %}checked{% endif %}>
+                            <input type="radio" id="pu2" name="punctuality" value="2">
                             <label for="pu2" title="2">★</label>
-                            <input type="radio" id="pu1" name="punctuality" value="1" {% if form.punctuality.value == 1 %}checked{% endif %}>
+                            <input type="radio" id="pu1" name="punctuality" value="1">
                             <label for="pu1" title="1">★</label>
                         </div>
                     </div>
@@ -115,15 +115,15 @@
                     <div class="criterion-item">
                         <span class="criterion-label">Safety & respect</span>
                         <div class="crit-stars-group">
-                            <input type="radio" id="sr5" name="safety_and_respect" value="5" {% if form.safety_and_respect.value == 5 or not form.safety_and_respect.value %}checked{% endif %}>
+                            <input type="radio" id="sr5" name="safety_and_respect" value="5" checked>
                             <label for="sr5" title="5">★</label>
-                            <input type="radio" id="sr4" name="safety_and_respect" value="4" {% if form.safety_and_respect.value == 4 %}checked{% endif %}>
+                            <input type="radio" id="sr4" name="safety_and_respect" value="4">
                             <label for="sr4" title="4">★</label>
-                            <input type="radio" id="sr3" name="safety_and_respect" value="3" {% if form.safety_and_respect.value == 3 %}checked{% endif %}>
+                            <input type="radio" id="sr3" name="safety_and_respect" value="3">
                             <label for="sr3" title="3">★</label>
-                            <input type="radio" id="sr2" name="safety_and_respect" value="2" {% if form.safety_and_respect.value == 2 %}checked{% endif %}>
+                            <input type="radio" id="sr2" name="safety_and_respect" value="2">
                             <label for="sr2" title="2">★</label>
-                            <input type="radio" id="sr1" name="safety_and_respect" value="1" {% if form.safety_and_respect.value == 1 %}checked{% endif %}>
+                            <input type="radio" id="sr1" name="safety_and_respect" value="1">
                             <label for="sr1" title="1">★</label>
                         </div>
                     </div>
@@ -132,20 +132,20 @@
                 <!-- Written Review -->
                 <div class="review-textarea-group">
                     <label for="id_review_text" class="textarea-label">Write a review</label>
-                    {{ form.review_text }}
+                    <textarea id="id_review_text" name="review_text" class="review-textarea" rows="4" placeholder="Share your experience with this tutor...">Explained every step clearly and always shared weekly progress with my parents. The online demo made us comfortable before we started.</textarea>
                 </div>
 
                 <!-- Post as verified student -->
                 <div class="verified-checkbox-row">
                     <label class="checkbox-container">
-                        {{ form.post_as_verified }}
+                        <input type="checkbox" id="id_post_as_verified" name="post_as_verified" value="true" checked class="form-checkbox">
                         <span class="checkbox-text">Post as verified student</span>
                     </label>
                 </div>
 
                 <!-- Action buttons -->
                 <div class="review-actions-bar">
-                    <a href="{% url 'reviews:review_history' %}" class="btn-review-cancel">Cancel</a>
+                    <a href="/reviews/history/" class="btn-review-cancel">Cancel</a>
                     <button type="submit" class="btn-review-submit">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>

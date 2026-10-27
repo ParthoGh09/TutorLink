@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,24 +8,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <div class="shell">
   <header class="topbar">
-    <a class="logo" href="{% url 'home' %}">
+    <a class="logo" href="/">
       <span class="logo-mark">🎓</span>
       <span><span class="logo-text">Tutor<em>Link</em></span><small>Connect | Learn | Earn | Safety</small></span>
     </a>
     <div class="loc-box"><small>Current Location</small><strong>📍 Dhanmondi, Dhaka</strong></div>
     <button class="btn btn-light" type="button">+ Add Location</button>
     <form class="search" onsubmit="return false;">
-      <input type="text" placeholder="Search tutors, posts, subjects...">
+      <input type="text" id="top-search" aria-label="Search tutors, posts, subjects" placeholder="Search tutors, posts, subjects...">
       <button type="submit" aria-label="Search">🔍</button>
     </form>
     <div class="top-icons">
-      <a href="{% url 'notifications:notification_list' %}" class="ico" title="Notifications">🔔<b>{{ unread_notifications_count|default:"3" }}</b></a>
-      <a href="{% url 'reviews:rate_tutor' %}" class="ico" title="Rate & Review">💬<b>2</b></a>
+      <a href="/notifications/" class="ico" title="Notifications">🔔<b>{{ unread_notifications_count|default:"3" }}</b></a>
+      <a href="/reviews/" class="ico" title="Rate & Review">💬<b>2</b></a>
     </div>
     <div class="user">
       <span class="avatar sm" style="background:#FFDCD6">{{ student.initials|default:"AR" }}</span>
