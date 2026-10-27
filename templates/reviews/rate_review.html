@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rate {{ tutor.get_full_name|default:"Tanvir Hasan" }} · TutorLink{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <!-- Back to History button (Pure HTML link) -->
+    <a href="{% url 'reviews:review_history' %}" class="btn-back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to History
+    </a>
+
+    <!-- Two-column Review layout matching Slide 16 -->
+    <div class="review-layout-grid">
+        <!-- Left: Rate Form Card -->
+        <section class="review-main-card">
+            <!-- Tutor profile header -->
+            <div class="tutor-header-row">
+                <div class="tutor-avatar-circle">
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="#2E3C86">
+                        <circle cx="12" cy="8" r="4"></circle>
+                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                    </svg>
+                </div>
+                <div class="tutor-title-col">
+                    <h2 class="tutor-rate-title">Rate {{ tutor.get_full_name|default:"Tanvir Hasan" }}</h2>
+                    <p class="tuition-subtitle-text">{{ tuition_title }}</p>
+                </div>
+            </div>
+
+            <!-- Standard Django Form without JavaScript -->
+            <form method="post" action="">
+                {% csrf_token %}
+
+                <!-- Overall rating highlight box (Pure HTML/CSS Star Selection) -->
+                <div class="overall-rating-card">
+                    <span class="rating-sublabel">Overall rating</span>
+                    <div class="star-rating-group">
+                        <input type="radio" id="ov5" name="overall_rating" value="5" {% if form.overall_rating.value == 5 or not form.overall_rating.value %}checked{% endif %}>
+                        <label for="ov5" title="5 - Excellent">★</label>
+
+                        <input type="radio" id="ov4" name="overall_rating" value="4" {% if form.overall_rating.value == 4 %}checked{% endif %}>
+                        <label for="ov4" title="4 - Very Good">★</label>
+
+                        <input type="radio" id="ov3" name="overall_rating" value="3" {% if form.overall_rating.value == 3 %}checked{% endif %}>
+                        <label for="ov3" title="3 - Good">★</label>
+
+                        <input type="radio" id="ov2" name="overall_rating" value="2" {% if form.overall_rating.value == 2 %}checked{% endif %}>
+                        <label for="ov2" title="2 - Fair">★</label>
+
+                        <input type="radio" id="ov1" name="overall_rating" value="1" {% if form.overall_rating.value == 1 %}checked{% endif %}>
+                        <label for="ov1" title="1 - Poor">★</label>
+                    </div>
+                    <div class="overall-score-display">5 · Excellent</div>
+                </div>
+
+                <!-- 4 Criteria Ratings (Pure HTML/CSS Interactive Stars) -->
+                <div class="criteria-container">
+                    <!-- 1. Subject Knowledge -->
+                    <div class="criterion-item">
+                        <span class="criterion-label">Subject knowledge</span>
+                        <div class="crit-stars-group">
+                            <input type="radio" id="sk5" name="subject_knowledge" value="5" {% if form.subject_knowledge.value == 5 or not form.subject_knowledge.value %}checked{% endif %}>
+                            <label for="sk5" title="5">★</label>
+                            <input type="radio" id="sk4" name="subject_knowledge" value="4" {% if form.subject_knowledge.value == 4 %}checked{% endif %}>
+                            <label for="sk4" title="4">★</label>
+                            <input type="radio" id="sk3" name="subject_knowledge" value="3" {% if form.subject_knowledge.value == 3 %}checked{% endif %}>
+                            <label for="sk3" title="3">★</label>
+                            <input type="radio" id="sk2" name="subject_knowledge" value="2" {% if form.subject_knowledge.value == 2 %}checked{% endif %}>
+                            <label for="sk2" title="2">★</label>
+                            <input type="radio" id="sk1" name="subject_knowledge" value="1" {% if form.subject_knowledge.value == 1 %}checked{% endif %}>
+                            <label for="sk1" title="1">★</label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Communication -->
+                    <div class="criterion-item">
+                        <span class="criterion-label">Communication</span>
+                        <div class="crit-stars-group">
+                            <input type="radio" id="cm5" name="communication" value="5" {% if form.communication.value == 5 or not form.communication.value %}checked{% endif %}>
+                            <label for="cm5" title="5">★</label>
+                            <input type="radio" id="cm4" name="communication" value="4" {% if form.communication.value == 4 %}checked{% endif %}>
+                            <label for="cm4" title="4">★</label>
+                            <input type="radio" id="cm3" name="communication" value="3" {% if form.communication.value == 3 %}checked{% endif %}>
+                            <label for="cm3" title="3">★</label>
+                            <input type="radio" id="cm2" name="communication" value="2" {% if form.communication.value == 2 %}checked{% endif %}>
+                            <label for="cm2" title="2">★</label>
+                            <input type="radio" id="cm1" name="communication" value="1" {% if form.communication.value == 1 %}checked{% endif %}>
+                            <label for="cm1" title="1">★</label>
+                        </div>
+                    </div>
+
+                    <!-- 3. Punctuality (Defaults to 4 matching Slide 16) -->
+                    <div class="criterion-item">
+                        <span class="criterion-label">Punctuality</span>
+                        <div class="crit-stars-group">
+                            <input type="radio" id="pu5" name="punctuality" value="5" {% if form.punctuality.value == 5 %}checked{% endif %}>
+                            <label for="pu5" title="5">★</label>
+                            <input type="radio" id="pu4" name="punctuality" value="4" {% if form.punctuality.value == 4 or not form.punctuality.value %}checked{% endif %}>
+                            <label for="pu4" title="4">★</label>
+                            <input type="radio" id="pu3" name="punctuality" value="3" {% if form.punctuality.value == 3 %}checked{% endif %}>
+                            <label for="pu3" title="3">★</label>
+                            <input type="radio" id="pu2" name="punctuality" value="2" {% if form.punctuality.value == 2 %}checked{% endif %}>
+                            <label for="pu2" title="2">★</label>
+                            <input type="radio" id="pu1" name="punctuality" value="1" {% if form.punctuality.value == 1 %}checked{% endif %}>
+                            <label for="pu1" title="1">★</label>
+                        </div>
+                    </div>
+
+                    <!-- 4. Safety & Respect -->
+                    <div class="criterion-item">
+                        <span class="criterion-label">Safety & respect</span>
+                        <div class="crit-stars-group">
+                            <input type="radio" id="sr5" name="safety_and_respect" value="5" {% if form.safety_and_respect.value == 5 or not form.safety_and_respect.value %}checked{% endif %}>
+                            <label for="sr5" title="5">★</label>
+                            <input type="radio" id="sr4" name="safety_and_respect" value="4" {% if form.safety_and_respect.value == 4 %}checked{% endif %}>
+                            <label for="sr4" title="4">★</label>
+                            <input type="radio" id="sr3" name="safety_and_respect" value="3" {% if form.safety_and_respect.value == 3 %}checked{% endif %}>
+                            <label for="sr3" title="3">★</label>
+                            <input type="radio" id="sr2" name="safety_and_respect" value="2" {% if form.safety_and_respect.value == 2 %}checked{% endif %}>
+                            <label for="sr2" title="2">★</label>
+                            <input type="radio" id="sr1" name="safety_and_respect" value="1" {% if form.safety_and_respect.value == 1 %}checked{% endif %}>
+                            <label for="sr1" title="1">★</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Written Review -->
+                <div class="review-textarea-group">
+                    <label for="id_review_text" class="textarea-label">Write a review</label>
+                    {{ form.review_text }}
+                </div>
+
+                <!-- Post as verified student -->
+                <div class="verified-checkbox-row">
+                    <label class="checkbox-container">
+                        {{ form.post_as_verified }}
+                        <span class="checkbox-text">Post as verified student</span>
+                    </label>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="review-actions-bar">
+                    <a href="{% url 'reviews:review_history' %}" class="btn-review-cancel">Cancel</a>
+                    <button type="submit" class="btn-review-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Right: Ratings Breakdown & Info Cards -->
+        <aside class="review-sidebar-col">
+            <!-- Tutor's Ratings Card -->
+            <div class="side-panel-card">
+                <h3 class="side-panel-title">{{ tutor.first_name|default:"Tanvir" }}'s ratings</h3>
+                <div class="rating-overall-metric">
+                    <span class="metric-score-huge">{{ rating_summary.avg_rating|default:"4.9" }}</span>
+                    <div class="metric-stars-col">
+                        <div class="gold-stars-row">★★★★★</div>
+                        <span class="metric-count-text">{{ rating_summary.total_count|default:"48" }} reviews</span>
+                    </div>
+                </div>
+
+                <!-- Distribution Bars -->
+                <div class="distribution-bars-list">
+                    <div class="dist-row">
+                        <span class="dist-star-label">5★</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill dist-fill-5"></div>
+                        </div>
+                        <span class="dist-pct-label">{{ rating_summary.distribution.5|default:88 }}%</span>
+                    </div>
+
+                    <div class="dist-row">
+                        <span class="dist-star-label">4★</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill dist-fill-4"></div>
+                        </div>
+                        <span class="dist-pct-label">{{ rating_summary.distribution.4|default:10 }}%</span>
+                    </div>
+
+                    <div class="dist-row">
+                        <span class="dist-star-label">3★</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill dist-fill-3"></div>
+                        </div>
+                        <span class="dist-pct-label">{{ rating_summary.distribution.3|default:2 }}%</span>
+                    </div>
+
+                    <div class="dist-row">
+                        <span class="dist-star-label">2★</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill dist-fill-2"></div>
+                        </div>
+                        <span class="dist-pct-label">{{ rating_summary.distribution.2|default:0 }}%</span>
+                    </div>
+
+                    <div class="dist-row">
+                        <span class="dist-star-label">1★</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill dist-fill-1"></div>
+                        </div>
+                        <span class="dist-pct-label">{{ rating_summary.distribution.1|default:0 }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-way ratings Card -->
+            <div class="side-panel-card two-way-card">
+                <h4 class="info-card-heading">Two-way ratings</h4>
+                <p class="info-card-text">Tutors also rate students after tuition. Honest reviews keep TutorLink trustworthy.</p>
+            </div>
+
+            <!-- Only after tuition Mint Card -->
+            <div class="side-mint-badge-card">
+                <div class="mint-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#12A783" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <polyline points="9 12 11 14 15 10"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="mint-card-heading">Only after tuition</h4>
+                    <p class="mint-card-text">You can review a tutor once your tuition is confirmed.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

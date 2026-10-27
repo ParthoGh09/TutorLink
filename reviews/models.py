@@ -34,7 +34,7 @@ class Review(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Review by {self.reviewer.username} for {self.reviewee.username} ({self.overall_rating}★)"
+        return f"Review by {self.reviewer.username} for {self.reviewee.username} ({self.overall_rating}/5 stars)"
 
     @classmethod
     def rate_tutor(cls, reviewer, tutor, tuition_title, overall_rating,

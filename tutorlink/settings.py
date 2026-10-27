@@ -4,7 +4,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "dev-only-secret-key-change-me"
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -14,6 +14,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "tuition",
+    "notifications",
+    "reviews",
 ]
 
 MIDDLEWARE = [
@@ -38,6 +40,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "notifications.context_processors.notifications_unread",
             ],
         },
     },

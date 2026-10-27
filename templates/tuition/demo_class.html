@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Demo Class · TutorLink{% endblock %}
+
+{% block content %}
+<a class="btn btn-back" href="{% url 'applications' %}">← Back to Applications</a>
+
+<section class="card page-head">
+  <span class="head-ico" style="background:#E4E9FF">🎥</span>
+  <div class="grow">
+    <h1>Demo Class</h1>
+    <p>Meet your tutor online before committing to offline tuition</p>
+  </div>
+  <div class="mini"><span class="mini-ico" style="background:#E7F8F1">🎥</span><div><strong>{{ completed_count }}</strong><small>Completed</small></div></div>
+  <div class="mini"><span class="mini-ico" style="background:#FBE77B">📅</span><div><strong>{{ upcoming_count }}</strong><small>Upcoming</small></div></div>
+</section>
+
+{% if not demo %}
+  <div class="card empty">No demo classes yet. Shortlist a tutor and press “Request Demo” on the Applications page.</div>
+{% else %}
+<div class="two-col demo-grid">
+  <div>
+    <section class="card">
+      <div class="card-top"><h4>Demo class details</h4><span class="badge b-d-{{ demo.status }}">{{ demo.get_status_display|upper }}</span></div>
+
+      <div class="pair">
+        <div class="person"><span class="avatar" style="background:#FFDCD6">{{ student.initials }}</span><div><strong>{{ student.name }}</strong><small>Student · {{ demo.application.post.class_level }}</small></div></div>
+        <span class="pair-line"><i>🎥 Online demo</i></span>
+        <div class="person right"><div><strong>{{ demo.tutor.name }}</strong><small>Tutor · {{ demo.tutor.institution }}</small></div><span class="avatar" style="background:{{ demo.tutor.avatar_color }}">{{ demo.tutor.initials }}</span></div>
+      </div>
+
+      <div class="info-grid">
+        <div><small>📅 Date</small><strong>{{ demo.date|date:"D, d M Y" }}</strong></div>
+        <div><small>🕒 Time</small><strong>{{ demo.time|time:"g:i A" }}</strong></div>
+        <div><small>⏱ Duration</small><strong>{{ demo.duration_minutes }} minutes</strong></div>
+        <div><small>💻 Platform</small><strong>{{ demo.get_platform_display }}</strong></div>
+      </div>
+
+      <div class="link-row">
+        <span class="grow">🔗 {{ demo.meeting_link }}</span>
+        <button class="btn btn-light btn-sm" type="button" onclick="navigator.clipboard.writeText('{{ demo.meeting_link }}'); this.textContent='Copied';">Copy</button>
+        <a class="btn btn-navy btn-sm" href="{{ demo.meeting_link }}" target="_blank" rel="noopener">Join</a>
+      </div>
+    </section>
+
+    {% if demo.status == "completed" %}
+    <section class="decision">
+      <h4>How was the demo? Make your decision <span>⚠</span></h4>
+      <p>Accepting moves this application to tuition. Rejecting closes it — you can still apply to other tutors.</p>
+      <div class="decision-btns">
+        <form method="post" action="{% url 'demo_action' demo.pk 'accept' %}">{% csrf_token %}<button class="btn btn-green btn-lg">✓ Accept Tutor</button></form>
+        <form method="post" action="{% url 'demo_action' demo.pk 'reject' %}">{% csrf_token %}<button class="btn btn-soft-red btn-lg">✕ Reject Tutor</button></form>
+      </div>
+    </section>
+    {% elif demo.status == "accepted" %}
+    <section class="result ok">
+      ✓ You accepted {{ demo.tutor.name }}. Offline tuition can now be planned.
+      <div style="margin-top: 10px;">
+        <a class="btn btn-navy" href="{% url 'reviews:rate_tutor' %}">★ Rate & Review Tutor</a>
+      </div>
+    </section>
+    {% elif demo.status == "rejected" %}
+    <section class="result no">✕ You rejected {{ demo.tutor.name }}. You can still apply to other tutors.</section>
+    {% endif %}
+
+    <section class="card">
+      <h4>Upcoming &amp; past demos</h4>
+      <div class="table-wrap">
+      <table class="demo-table">
+        <thead><tr><th>Tutor</th><th>Subject</th><th>Date</th><th>Platform</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for d in demos %}
+          <tr{% if d.pk == demo.pk %} class="sel"{% endif %}>
+            <td><a href="{% url 'demo_class' d.pk %}"><b>{{ d.tutor.name }}</b></a></td>
+            <td>{{ d.subject }}</td>
+            <td>{{ d.date|date:"D d M" }} · {{ d.time|time:"g A" }}</td>
+            <td>{{ d.get_platform_display }}</td>
+            <td><span class="badge b-d-{{ d.status }}">{{ d.get_status_display|upper }}</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </section>
+  </div>
+
+  <aside>
+    <section class="card side-card">
+      <h4>Progress</h4>
+      <ul class="timeline">
+        {% for step in timeline %}
+        <li class="tl-{{ step.state }}"><strong>{{ step.label }}</strong><small>{{ step.sub }}</small></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="card side-card">
+      <h4>Actions</h4>
+      {% if demo.status == "requested" or demo.status == "scheduled" or demo.status == "no_show" %}
+      <details class="resched">
+        <summary class="btn btn-light btn-block">📅 Reschedule</summary>
+        <form method="post" action="{% url 'demo_action' demo.pk 'reschedule' %}">{% csrf_token %}
+          <label>Date <input type="date" name="date" value="{{ demo.date|date:'Y-m-d' }}" required></label>
+          <label>Time <input type="time" name="time" value="{{ demo.time|time:'H:i' }}" required></label>
+          <button class="btn btn-navy btn-block">Save new time</button>
+        </form>
+      </details>
+      {% endif %}
+      <a class="btn btn-light btn-block" href="#">💬 Message {{ demo.tutor.name|truncatechars:12 }}</a>
+      {% if demo.status == "requested" or demo.status == "scheduled" %}
+      <form method="post" action="{% url 'demo_action' demo.pk 'cancel' %}">{% csrf_token %}<button class="btn btn-light btn-block red-text">✕ Cancel Demo</button></form>
+      {% endif %}
+    </section>
+
+    <section class="card tip">
+      <strong>🛡 Mandatory online demo</strong>
+      <p>Only one demo per tutor-student pair. Offline meeting unlocks after acceptance.</p>
+    </section>
+
+    {% if dev_tools %}
+    <section class="card dev">
+      <strong>🛠 Dev tools (only while DEBUG = True)</strong>
+      <p>The tutor side is not built yet, so use these to test the flow.</p>
+      {% if demo.status == "requested" %}
+      <form method="post" action="{% url 'demo_action' demo.pk 'dev_confirm' %}">{% csrf_token %}<button class="btn btn-light btn-block">Tutor confirms time</button></form>
+      {% elif demo.status == "scheduled" %}
+      <form method="post" action="{% url 'demo_action' demo.pk 'dev_complete' %}">{% csrf_token %}<button class="btn btn-light btn-block">Mark demo completed</button></form>
+      {% endif %}
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

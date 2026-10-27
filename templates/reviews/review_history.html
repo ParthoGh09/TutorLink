@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review History · TutorLink{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <!-- Subnav / Back button -->
+    <div class="history-top-actions">
+        <a href="{% url 'reviews:rate_tutor' %}" class="btn-back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Rate Tutor
+        </a>
+
+        <a href="{% url 'reviews:rate_tutor' %}" class="btn btn-coral-action">
+            + Rate a Tutor
+        </a>
+    </div>
+
+    <!-- History Header Card -->
+    <div class="notifications-header-card">
+        <div class="header-left">
+            <div class="header-icon-box header-icon-gold">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#E69500" stroke="#E69500" stroke-width="1.5">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            <div>
+                <h1 class="header-title">Review History</h1>
+                <p class="header-subtitle">Verified feedback and ratings for completed tuition sessions</p>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="header-stat-pill">
+                <div class="stat-ico-wrap stat-ico-gold">★</div>
+                <div class="stat-text-col">
+                    <span class="stat-number">{{ reviews|length }}</span>
+                    <span class="stat-label">Total Reviews</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Grid -->
+    <div class="history-reviews-grid">
+        {% for r in reviews %}
+        <article class="history-review-card">
+            <div class="review-card-head">
+                <div class="review-users-flow">
+                    <div class="user-avatar-badge">{{ r.reviewer.first_name|default:"A"|slice:":1" }}</div>
+                    <div>
+                        <h3 class="reviewer-name">{{ r.reviewer.get_full_name|default:r.reviewer.username }}</h3>
+                        <span class="review-target-name">reviewed <strong>{{ r.reviewee.get_full_name|default:r.reviewee.username }}</strong></span>
+                    </div>
+                </div>
+
+                <div class="review-score-badge">
+                    <span class="score-num">{{ r.overall_rating }}.0</span>
+                    <span class="score-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= r.overall_rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="review-tuition-line">{{ r.tuition_title }}</div>
+
+            {% if r.review_text %}
+            <p class="review-body-text">“{{ r.review_text }}”</p>
+            {% endif %}
+
+            <div class="review-criteria-tags">
+                <span class="crit-tag">Knowledge: {{ r.subject_knowledge }}★</span>
+                <span class="crit-tag">Communication: {{ r.communication }}★</span>
+                <span class="crit-tag">Punctuality: {{ r.punctuality }}★</span>
+                <span class="crit-tag">Safety: {{ r.safety_and_respect }}★</span>
+            </div>
+
+            <div class="review-card-foot">
+                {% if r.post_as_verified %}
+                <span class="verified-badge-pill">🛡 Verified Student</span>
+                {% endif %}
+                <time class="review-date-text">{{ r.created_at|date:"M d, Y" }}</time>
+            </div>
+        </article>
+        {% empty %}
+        <div class="empty-notifications-card">
+            <div class="empty-icon-circle">⭐</div>
+            <h3>No reviews yet</h3>
+            <p>You haven't submitted any reviews yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
