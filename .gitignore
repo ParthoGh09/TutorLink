@@ -6,3 +6,5 @@ db.sqlite3
 .idea/
 .vscode/
 .env
+EXPORT_BUNDLE/
+*.zip
